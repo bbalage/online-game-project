@@ -1,0 +1,11 @@
+<mat-grid-list cols="5" rowHeight="fit" id="main-screen-grid">
+    <mat-grid-tile [colspan]="5" [rowspan]="1" [style.background]="'lightblue'">
+        <app-info-bar></app-info-bar>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="4" [rowspan]="15" [style.background]="'red'">
+        <app-canvas></app-canvas>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="1" [rowspan]="15" [style.background]="'green'">
+        <app-chat></app-chat>
+    </mat-grid-tile>
+</mat-grid-list>
