@@ -12,17 +12,35 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 const userdao = new UserDao();
+/*
 userdao.addUser({
     id:null,
-    username:"alma",
+    username:"almb",
     password:"asd"
+}).then(function(res){
+    console.log(res);
+}).catch(function(res){
+    console.log(res);
 })
-console.log(userdao.getLoginUserId({
+
+userdao.getLoginUserId({
     id:null,
-    username: "alma",
+    username: "al",
     password: "asd"
-}))
-console.log(userdao.getAllUserNameAndId());
+}).then(function(res){
+    console.log(res);
+}).catch(function(res){
+    console.log(res);
+})
+*/
+
+userdao.getAllUserNameAndId()
+.then(function(res){
+    console.log("gut:"+res);
+}).catch(function(res){
+    console.log("bad"+res);
+})
+
 
 wss.on('connection', (ws: WebSocket) => {
 
