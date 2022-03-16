@@ -10,6 +10,12 @@ import { CanvasComponent } from './main-screen/canvas/canvas.component';
 import { ChatComponent } from './main-screen/chat/chat.component';
 import { InfoBarComponent } from './main-screen/info-bar/info-bar.component';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -19,13 +25,20 @@ import { MatGridListModule } from '@angular/material/grid-list';
     MainScreenComponent,
     CanvasComponent,
     ChatComponent,
-    InfoBarComponent
+    InfoBarComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    MatGridListModule
+    MatGridListModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatCheckboxModule,
+    MatCardModule,
+    MatButtonModule
   ],
   providers: [],
   bootstrap: [AppComponent]

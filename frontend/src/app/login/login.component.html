@@ -1,1 +1,23 @@
-<p>login works!</p>
+<div class="container">
+    <mat-card>
+        <mat-card-content>
+            <form [formGroup]="loginForm" (ngSubmit)="isPlayerChecked ? checkUserRegistration() ? login() : register() : checkUserRegistration()">
+                <h1>Log In</h1>
+                <!-- <mat-error *ngIf="!loginValid">
+              The username and password were not recognized
+            </mat-error> -->
+                <mat-form-field>
+                    <input matInput placeholder="Karesz576" formControlName="username" />
+                    <mat-error> Please provide a valid username </mat-error>
+                </mat-form-field>
+                <mat-form-field *ngIf="isPlayerChecked">
+                    <input matInput type="password" placeholder="Password" formControlName="password" name="password" />
+                    <mat-error> Please provide a valid password </mat-error>
+                </mat-form-field>
+
+                <button [textContent]="isPlayerChecked ? checkUserRegistration() ? 'Login' : 'Register' : 'Check user'" mat-raised-button color="primary" [disabled]="!loginForm.valid">
+                </button>
+            </form>
+        </mat-card-content>
+    </mat-card>
+</div>

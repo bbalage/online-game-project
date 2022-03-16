@@ -1,0 +1,25 @@
+.container {
+    height: 100vh;
+    background-color: lightslategray;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+mat-card {
+    width: 30%;
+    text-align: center;
+}
+
+mat-form-field {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: large;
+}
+
+button {
+    width: 50%;
+    height: 40px;
+}
