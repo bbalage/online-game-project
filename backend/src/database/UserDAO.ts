@@ -5,22 +5,18 @@ import { getConnection } from './Connection';
 export class UserDao{
 
     constructor(){
-        this.init();
+        this.init()
     }
 
     private async init(){
-        return new Promise(function(resolve,reject){
         getConnection().run("CREATE TABLE user ( id integer primary key, username text not null, password text not null);", function(err){
             if (err){
                 console.log("User table already created!");
-                reject(false);
             }
             else{
                 console.log("User table successfully created!");
-                resolve(true);
             }
         });
-    });
     }
 
     addUser(user:User):Promise<boolean>{
@@ -45,7 +41,6 @@ export class UserDao{
 
     getLoginUserId(user:User):Promise<number>{
         let prepared:Statement = getConnection().prepare("SELECT id FROM user WHERE username=? AND password=?");
-        let id=-1;
         return new Promise(function(resolve,reject){
         prepared.get(user.username,user.password,function(err:Error|null,row:any){
             if (!err){
@@ -66,13 +61,45 @@ export class UserDao{
         return new Promise(function(resolve,reject){
             prepared.all(function (err,rows){
                     if (!err){
-                        resolve(rows);
+                        console.log(rows);
+                        let userList:User[] = []
+                        for (const row of rows){
+                            let user:User={
+                                id:row.id,
+                                username:row.username,
+                                password:""
+
+                            }
+                            userList.push(user);
+                        }
+                        resolve(userList);
                     }
                     else{
-                        reject("error");
+                        resolve("error");
                     }
                 });
             });
+    }
+
+    getUserById(id:number):Promise<User>{
+        let prepared:Statement = getConnection().prepare("SELECT id, username FROM user WHERE id=?");
+        return new Promise(function(resolve,reject){
+        prepared.get(id,function(err:Error|null,row:any){
+            if (!err){
+                if (row){
+                    let user:User={
+                        id:row.id,
+                        username:row.username,
+                        password:""
+                    }
+                    resolve(user);
+                }
+                else{
+                    reject(-1);
+                }
+            }
+        })
+        })
     }
 
 

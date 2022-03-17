@@ -2,6 +2,7 @@ import express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
 import { UserDao } from './database/UserDAO';
+import { UserHistoryDAO } from './database/UserHistoryDAO';
 
 const app = express();
 
@@ -10,37 +11,6 @@ const server = http.createServer(app);
 
 //initialize the WebSocket server instance
 const wss = new WebSocket.Server({ server });
-
-const userdao = new UserDao();
-/*
-userdao.addUser({
-    id:null,
-    username:"almb",
-    password:"asd"
-}).then(function(res){
-    console.log(res);
-}).catch(function(res){
-    console.log(res);
-})
-
-userdao.getLoginUserId({
-    id:null,
-    username: "al",
-    password: "asd"
-}).then(function(res){
-    console.log(res);
-}).catch(function(res){
-    console.log(res);
-})
-*/
-
-userdao.getAllUserNameAndId()
-.then(function(res){
-    console.log("gut:"+res);
-}).catch(function(res){
-    console.log("bad"+res);
-})
-
 
 wss.on('connection', (ws: WebSocket) => {
 
