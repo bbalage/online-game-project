@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { WebsocketService } from '../services/websocket.service';
 
 @Component({
   selector: 'app-main-screen',
@@ -6,6 +7,10 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./main-screen.component.css']
 })
 export class MainScreenComponent implements OnInit {
+
+  constructor(private wsService: WebsocketService) {
+  }
+
 
   ngOnInit(): void {
 
