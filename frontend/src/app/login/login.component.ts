@@ -19,21 +19,23 @@ export class LoginComponent implements OnInit {
 
   users!: User[];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private userService: UserService) {}
 
   ngOnInit(): void {
-    // this.userService.getUsers().subscribe((users) => {
-    //   this.users = users;
-    // });
+    //EXAMPLE, DELETE LATER
     var user1: User = { id: 0, username: 'marci', password: '123' };
     var user2: User = { id: 1, username: 'béla', password: '121' };
     var user3: User = { id: 2, username: 'kata', password: '122' };
     this.users = [user1, user2, user3];
   }
 
+  //TODO finish after DAO update
   login() {
     const user = this.loginForm.value;
 
+    this.userService.authenticateUser(user);//USE THIS LATER
+
+    //EXAMPLE, DELETE LATER
     for (let u of this.users) {
       if (u.username == user.username && u.password == user.password) {
         sessionStorage.setItem('user', JSON.stringify(this.loginForm.value));
@@ -44,11 +46,13 @@ export class LoginComponent implements OnInit {
   }
 
   register() {
+    //EXAMPLE, DELETE LATER
     sessionStorage.setItem('user', JSON.stringify(this.loginForm.value));
     this.router.navigateByUrl('/home');
   }
 
   checkUserRegistration(): boolean {
+    //EXAMPLE, DELETE LATER
     const user = this.loginForm.value;
 
     var isPlayerRegistered = false;

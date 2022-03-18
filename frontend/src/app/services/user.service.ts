@@ -21,4 +21,6 @@ export class UserService extends BaseService {
         catchError<User[], Observable<never>>((err) => this.handleError(err))
       );
   }
+  //TODO implement
+  public authenticateUser(User: User) {}
 }
