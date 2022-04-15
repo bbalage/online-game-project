@@ -1,1 +1,4 @@
-<p>chat works!</p>
+<div *ngFor="let chatBubble of chatBubbles">
+    {{ chatBubble.text }}
+</div>
+<button (click)="sendChatMessage()" mat-button color="primary">Send message</button>

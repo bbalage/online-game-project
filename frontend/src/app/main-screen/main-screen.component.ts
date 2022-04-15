@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { WebsocketService } from '../services/websocket.service';
+import { WebSocketService } from '../services/websocket.service';
 
 @Component({
   selector: 'app-main-screen',
@@ -8,7 +8,7 @@ import { WebsocketService } from '../services/websocket.service';
 })
 export class MainScreenComponent implements OnInit {
 
-  constructor(private wsService: WebsocketService) {
+  constructor(private wsService: WebSocketService) {
   }
 
 

@@ -13,8 +13,8 @@ const server = http.createServer(app);
 //start our server
 const port: number = 3000;
 
-const chatService = new ChatService();
-const wsServer = new WebSocketService(server, chatService);
+const webSocketService = new WebSocketService(server);
+const chatService = new ChatService(webSocketService);
 server.listen(port, () => {
     console.log('Listening on ' + port);
 });

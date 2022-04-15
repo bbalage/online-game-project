@@ -1,6 +1,7 @@
 import * as WebSocket from 'ws';
 import * as http from 'http';
 import { ChatService } from './chat-service';
+import { Subject } from 'rxjs';
 
 export enum MessageType {
     RegisterUser = 1,
@@ -8,7 +9,7 @@ export enum MessageType {
     GameStatus,
 }
 
-export interface WSMessage {
+export interface WSMessageReceived {
     header: {
         type: MessageType,
         userId: number,
@@ -17,7 +18,15 @@ export interface WSMessage {
     data?: any
 }
 
-export interface WSAnswer {
+export interface WSMessageChat {
+    header: {
+        userId: number,
+        timestamp: Date
+    }
+    data?: any
+}
+
+export interface WSMessageSend {
     header: {
         type: MessageType,
         timestamp: Date
@@ -25,38 +34,30 @@ export interface WSAnswer {
     data?: any
 }
 
-export interface WSAnswers {
-    recipients: [],
-    message: WSAnswer
-}
-
 export class WebSocketService {
 
-    chatService!: ChatService;
+    ws!: WebSocket.Server;
+    public readonly chatMessages$ = new Subject<WSMessageChat>();
 
-    constructor(server: http.Server, chatService: ChatService) {
-        this.chatService = chatService;
+    constructor(server: http.Server) {
         this.initWebSocket(server);
     }
 
     private initWebSocket(server: http.Server) {
-        const ws = new WebSocket.Server({ server });
+        this.ws = new WebSocket.Server({ server });
 
-        ws.on('connection', (ws: WebSocket) => {
+        this.ws.on('connection', (ws: WebSocket) => {
 
             ws.onmessage = (message: WebSocket.MessageEvent) => {
-                console.log('received: %s', message.data);
-                ws.send(`Hello, you sent -> ${message.data}`);
-                const msg = JSON.parse(message.data.toString()) as WSMessage;
+                const msg = JSON.parse(message.data.toString()) as WSMessageReceived;
                 switch (msg.header.type) {
+                    // TODO: Do actual registration of user, and use this registration!
                     case MessageType.RegisterUser:
                         console.log("Registering user: %s", msg.header.userId);
                         break;
                     case MessageType.ChatMessage:
                         console.log("Handling chat message: %s", msg.header.userId);
-                        // TODO: Make this asyncronous (and learn to spell the word)
-                        const answers = this.chatService.handleMessage();
-                        this.reply(answers);
+                        this.chatMessages$.next(msg);
                         break;
                     case MessageType.GameStatus:
                         console.log("Handling new game status: %s", msg.header.userId);
@@ -72,12 +73,13 @@ export class WebSocketService {
                 // TODO: Remove connection
                 console.log('Connection removed: %s', closeEvent.target);
             };
-
-            ws.send('Hi there, I am a WebSocket server');
         });
     }
 
-    private reply(answers: WSAnswers) {
-        // TODO: Map listener websockets to user ids.
+    // TODO: Use clients parameter to send only to specific clients. Possibly userId would be better for this?
+    public send(message: WSMessageSend, clients?: WebSocket.WebSocket) {
+        this.ws.clients.forEach((client) => {
+            client.send(JSON.stringify(message));
+        });
     }
 }

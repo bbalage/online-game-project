@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 // TODO: Move to config file
 const CHAT_URL: string = "ws://localhost:3000";
@@ -9,9 +10,17 @@ export enum WSMessageType {
   GameStatus,
 }
 
-export interface WSMessage {
+export interface WSMessageSend {
   header: {
     type: WSMessageType,
+    userId: number,
+    timestamp: Date
+  }
+  data?: any
+}
+
+export interface WSMessageChat {
+  header: {
     userId: number,
     timestamp: Date
   }
@@ -21,10 +30,11 @@ export interface WSMessage {
 @Injectable({
   providedIn: 'root'
 })
-export class WebsocketService {
+export class WebSocketService {
 
-  ws!: WebSocket;
+  private ws = new WebSocket(CHAT_URL);
   userId!: number;
+  public readonly chatMessages$ = new Subject<WSMessageChat>();
 
   constructor() {
     this.initWebSocket();
@@ -32,7 +42,6 @@ export class WebsocketService {
 
   setUser(userId: number) {
     this.userId = userId;
-    console.log("Calling send message.");
     this.sendMessage({
       header: {
         type: WSMessageType.RegisterUser,
@@ -42,19 +51,24 @@ export class WebsocketService {
     })
   }
 
-  sendMessage(message: WSMessage) {
-    console.log("Sending message.");
+  sendMessage(message: WSMessageSend) {
+    console.log(`Sending message:\n${message}`);
     this.ws.send(JSON.stringify(message));
   }
 
   private initWebSocket() {
-    this.ws = new WebSocket(CHAT_URL);
     this.ws.onopen = (ev: any) => {
       console.log("Connection opened.");
       this.setUser(1);
     }
     this.ws.onmessage = (messageEvent: any) => {
-      console.log(messageEvent);
+      console.log(`Received message: ${messageEvent}`);
+      const msg = JSON.parse(messageEvent.data)
+      switch (msg.header.type) {
+        case WSMessageType.ChatMessage:
+          this.chatMessages$.next(msg);
+          break;
+      }
     };
     this.ws.onclose = (ev: any) => {
       console.log("Connection closed.");
