@@ -10,7 +10,15 @@ import { CanvasComponent } from './main-screen/canvas/canvas.component';
 import { ChatComponent } from './main-screen/chat/chat.component';
 import { InfoBarComponent } from './main-screen/info-bar/info-bar.component';
 import { MatGridListModule } from '@angular/material/grid-list';
-
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatListModule } from '@angular/material/list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { AdminComponent } from './admin/admin.component';
+import { MatButtonModule } from '@angular/material/button';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -19,15 +27,25 @@ import { MatGridListModule } from '@angular/material/grid-list';
     MainScreenComponent,
     CanvasComponent,
     ChatComponent,
-    InfoBarComponent
+    InfoBarComponent,
+    AdminComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    MatGridListModule
+    MatGridListModule,
+    MatTabsModule,
+    MatListModule,
+    MatIconModule,
+    MatInputModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatSelectModule,
+    FormsModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
