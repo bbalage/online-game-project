@@ -1,6 +1,8 @@
 import express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
+import { UserDao } from './database/UserDAO';
+import { UserHistoryDAO } from './database/UserHistoryDAO';
 
 const app = express();
 
