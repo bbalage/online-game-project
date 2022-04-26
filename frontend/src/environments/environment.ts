@@ -4,9 +4,11 @@
 
 export const environment = {
   production: false,
-  serverUrl: '',
-  users:'',
-  auth:'',
+  serverUrl: 'http://localhost:3000',
+  users:'/users',
+  validate: "/validateUser",
+  add: "/addUser",
+  get: "/getUsers",
 };
 
 /*

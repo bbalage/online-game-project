@@ -1,56 +1,60 @@
 import { Router } from "express";
 import * as fs from "fs";
 import jwt from "jsonwebtoken";
-// import { UserDao } from "../database/UserDAO";
-// const errorHandling = require('../util/error-handling');
+import { UserDao } from "../database/UserDAO";
+import { User } from "../model/User";
 
-//TODO: generate key
-const RSA_PRIVATE_KEY = fs.readFileSync("./../keys/jwtRS256.key"); 
+const RSA_PRIVATE_KEY = fs.readFileSync(__dirname + "../../keys/jwtRS256.key");
 const bearerExpirationTimeSeconds = 7200;
 const router = Router();
-
+const userdao = new UserDao();
 
 export function getRouter(): Router {
-  router.post("/auth", async function (req, res) {
-    const email = req.body.email;
+  router.post("/validateUser", async function (req, res) {
+    const user: User = req.body.User;
 
-    if (await validateUserameAndPassword(email, req.body.password)) {
-      const adminId = await findUserId(email);
+    userdao
+      .getLoginUserId(user)
+      .then(function (rowId) {
+        const jwtBearerToken = jwt.sign({}, RSA_PRIVATE_KEY, {
+          algorithm: "RS256",
+          expiresIn: bearerExpirationTimeSeconds,
+          subject: rowId.toString(),
+        });
 
-      const jwtBearerToken = jwt.sign({}, RSA_PRIVATE_KEY, {
-        algorithm: "RS256",
-        expiresIn: bearerExpirationTimeSeconds,
-        subject: adminId,
+        res.status(200).json({
+          idToken: jwtBearerToken,
+          expiresIn: bearerExpirationTimeSeconds,
+        });
+      })
+      .catch(function () {
+        res.status(401).send("Unauthorized");
       });
+  });
 
-      res.status(200).json({
-        idToken: jwtBearerToken,
-        expiresIn: bearerExpirationTimeSeconds,
+  router.post("/addUser", async function (req, res) {
+    const user: User = req.body.User;
+
+    userdao
+      .addUser(user)
+      .then(function (result) {
+        res.status(200).send();
+      })
+      .catch(function () {
+        res.status(406).send("User Already created");
       });
-    } else {
-      res.sendStatus(401);
-    }
+  });
+
+  router.get("/getUsers", async function (req, res) {
+    userdao.getAllUserNameAndId()
+      .then(function (users: User[]) {
+        console.log(users);
+        res.status(200).send(users);
+      })
+      .catch(function () {
+        res.status(500).send("Database is currently unavailable");
+      });
   });
 
   return router;
-}
-
-async function validateUserameAndPassword(
-  email: string,
-  password: string
-): Promise<boolean> {
-  //   const admin = UserDao.getLoginUserId(email);
-  //   if (!admin) {
-  //     return false;
-  //   }
-  //   return validatePasswordForAdmin(admin, password);
-  return false;
-}
-
-//TODO: create method in UserDao
-async function findUserId(username: string): Promise<string> {
-  //   const admin = await UserDao.get;
-  //   return admin.id.toString();
-
-  return "id";
 }

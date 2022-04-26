@@ -18,7 +18,6 @@ export class BaseService {
     } else if (errorRes.status === 422) {
       errorMsg = errorRes.error.detail;
     }
-
     return throwError(() => new Error(errorMsg));
   }
 }
