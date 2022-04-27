@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { UserDao } from "../database/UserDAO";
 import { User } from "../model/User";
 
-const RSA_PRIVATE_KEY = fs.readFileSync(__dirname + "../../keys/jwtRS256.key");
+const RSA_PRIVATE_KEY = fs.readFileSync("src/keys/jwtRS256.key");
 const bearerExpirationTimeSeconds = 7200;
 const router = Router();
 const userdao = new UserDao();
@@ -12,7 +12,6 @@ const userdao = new UserDao();
 export function getRouter(): Router {
   router.post("/validateUser", async function (req, res) {
     const user: User = req.body.User;
-
     userdao
       .getLoginUserId(user)
       .then(function (rowId) {
