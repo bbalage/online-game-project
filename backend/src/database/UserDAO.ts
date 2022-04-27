@@ -75,7 +75,7 @@ export class UserDao{
                         resolve(userList);
                     }
                     else{
-                        resolve("error");
+                        resolve([]);
                     }
                 });
             });
