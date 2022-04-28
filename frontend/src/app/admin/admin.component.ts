@@ -1,25 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl, Validators} from '@angular/forms';
+import { Component, ViewEncapsulation } from '@angular/core';
 
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.css']
+  styleUrls: ['./admin.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
-export class AdminComponent implements OnInit {
-
+export class AdminComponent {
   constructor() { }
-
-  users : String[] = [];
-
-  username = new FormControl('', [Validators.required]);
-  asd : string = "";
-
-  ngOnInit(): void {
-    this.users.push("User1");
-    this.users.push("User2");
-    this.users.push("User3");
-  }
-
 }

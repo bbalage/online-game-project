@@ -3,6 +3,7 @@ import * as http from "http";
 import * as WebSocket from "ws";
 import { getRouter } from "./routes/auth.route";
 import cors from "cors";
+import { getHistoryRouter } from "./routes/history.route";
 
 const app = express();
 
@@ -14,7 +15,7 @@ const wss = new WebSocket.Server({ server });
 const allowedOrigins = ["http://localhost:4200"];
 
 const options: cors.CorsOptions = {
-    origin: allowedOrigins,
+  origin: allowedOrigins,
 };
 
 app.use(cors(options));
@@ -37,4 +38,5 @@ const port: number = 3000;
 server.listen(port, () => {
   console.log("Listening on " + port);
   app.use("/users", getRouter());
+  app.use("/histories", getHistoryRouter());
 });

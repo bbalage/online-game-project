@@ -1,61 +1,16 @@
 <mat-tab-group animationDuration="700" mat-align-tabs="center">
   <mat-tab label="User Management">
     <div class="container">
-      <h2>Users</h2>
-      <mat-list>
-        <mat-list-item *ngFor="let user of users">
-          <mat-icon mat-list-icon>person</mat-icon>
-          <div mat-line>{{ user }}</div>
-        </mat-list-item>
-        <mat-divider></mat-divider>
-      </mat-list>
-
-      <h2>Add User</h2>
-      <mat-form-field appearance="standard">
-        <mat-label>Enter Username</mat-label>
-        <input matInput placeholder="Bred" [formControl]="username" required />
-        <mat-error *ngIf="username.invalid">You must enter a value</mat-error>
-      </mat-form-field>
-
-      <div>
-        <button *ngIf="username.valid" mat-raised-button color="primary">
-          Add User
-        </button>
-      </div>
+      <app-users></app-users>
     </div>
   </mat-tab>
   <mat-tab label="High Scores">
     <div class="container">
-      <h2>High Scores</h2>
-      <mat-list>
-        <mat-list-item *ngFor="let user of users">
-          <mat-icon mat-list-icon>games</mat-icon>
-          <div mat-line>{{ user }}</div>
-          <div mat-line>200 point</div>
-        </mat-list-item>
-        <mat-divider></mat-divider>
-      </mat-list>
+      <app-scores></app-scores>
     </div>
   </mat-tab>
   <mat-tab label="Messages">
     <div class="container">
-      <h2>Send Message</h2>
-      <mat-form-field appearance="fill">
-        <mat-label>To</mat-label>
-        <mat-select [(ngModel)]="asd">
-          <!-- <mat-option *ngFor="let user of users" [value]="user.id"> -->
-            <mat-option *ngFor="let user of users" [value]="user">
-            {{ user }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <div>
-        <button *ngIf="asd.length > 0" mat-raised-button color="primary">
-          Add User
-        </button>
-      </div>
-
     </div>
   </mat-tab>
 </mat-tab-group>

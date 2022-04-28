@@ -23,6 +23,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RegistrationComponent } from './registration/registration.component';
+import { MatTableModule } from '@angular/material/table';
+import { UsersComponent } from './admin/users/users.component';
+import { ScoresComponent } from './admin/scores/scores.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +37,8 @@ import { RegistrationComponent } from './registration/registration.component';
     InfoBarComponent,
     AdminComponent,
     RegistrationComponent,
+    UsersComponent,
+    ScoresComponent,
   ],
   imports: [
     BrowserModule,
@@ -53,8 +58,9 @@ import { RegistrationComponent } from './registration/registration.component';
     MatCardModule,
     MatButtonModule,
     HttpClientModule,
+    MatTableModule
   ],
   providers: [],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

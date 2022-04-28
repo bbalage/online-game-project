@@ -9,13 +9,10 @@ import { AuthorizationGuard } from './services/authorization.guard';
 const routes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'home', component: MainScreenComponent, canActivate: [AuthorizationGuard] },
-  { path: "login", component: LoginComponent },
-  { path: "registration", component: RegistrationComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'registration', component: RegistrationComponent },
+  { path: 'admin', component:AdminComponent },
   { path: '**', component: LoginComponent },
-  {
-    path:'admin',
-    component:AdminComponent
-  }
 ];
 
 @NgModule({
