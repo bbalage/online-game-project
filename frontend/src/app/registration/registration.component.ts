@@ -4,31 +4,30 @@ import { UserService } from '../services/user.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
+  selector: 'app-registration',
+  templateUrl: './registration.component.html',
+  styleUrls: ['./registration.component.css'],
 })
-export class LoginComponent {
-  loginForm = new FormGroup({
+export class RegistrationComponent {
+  registrationForm = new FormGroup({
     username: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
   });
 
-  isUserValid: boolean = true;
+  message: string = '';
 
   constructor(private router: Router, private userService: UserService) {}
 
-  login() {
-    const user = this.loginForm.value;
-    this.userService.authenticateUser(user).subscribe(
-      () => {
-        this.router.navigateByUrl('/home');
-      },
-      (err) => (this.isUserValid = false)
-    );
-  }
-
   register() {
-    this.router.navigateByUrl('/registration');
+    const user = this.registrationForm.value;
+
+    this.userService.addUser(user).subscribe(
+      () => {
+        this.router.navigateByUrl('/login');
+      },
+      (err) => {
+        this.message = err.toString();
+      }
+    );
   }
 }
