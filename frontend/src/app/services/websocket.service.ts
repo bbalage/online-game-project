@@ -27,6 +27,15 @@ export interface WSMessageChat {
   data?: any
 }
 
+export interface WSMessageGame {
+  header: {
+    timestamp: Date
+  }
+  data: [
+    { pos: { x: number, y: number } }
+  ]
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,6 +44,7 @@ export class WebSocketService {
   private ws = new WebSocket(CHAT_URL);
   userId!: number;
   public readonly chatMessages$ = new Subject<WSMessageChat>();
+  public readonly gameMessages$ = new Subject<WSMessageGame>();
 
   constructor() {
     this.initWebSocket();
@@ -67,6 +77,9 @@ export class WebSocketService {
       switch (msg.header.type) {
         case WSMessageType.ChatMessage:
           this.chatMessages$.next(msg);
+          break;
+        case WSMessageType.GameStatus:
+          this.gameMessages$.next(msg);
           break;
       }
     };

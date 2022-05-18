@@ -4,7 +4,6 @@ import { UserDao } from './database/UserDAO';
 import { UserHistoryDAO } from './database/UserHistoryDAO';
 import { ChatService } from './websocket/chat-service';
 import { WebSocketService } from './websocket/websocket-service';
-import * as WebSocket from "ws";
 import { getRouter } from "./routes/auth.route";
 import cors from "cors";
 import { getHistoryRouter } from "./routes/history.route";
