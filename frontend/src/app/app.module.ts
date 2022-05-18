@@ -10,6 +10,11 @@ import { CanvasComponent } from './main-screen/canvas/canvas.component';
 import { ChatComponent } from './main-screen/chat/chat.component';
 import { InfoBarComponent } from './main-screen/info-bar/info-bar.component';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatListModule } from '@angular/material/list';
+import { MatIconModule } from '@angular/material/icon';
+import { AdminComponent } from './admin/admin.component';
+import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -18,6 +23,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RegistrationComponent } from './registration/registration.component';
+import { MatTableModule } from '@angular/material/table';
+import { UsersComponent } from './admin/users/users.component';
+import { ScoresComponent } from './admin/scores/scores.component';
 
 @NgModule({
   declarations: [
@@ -27,13 +35,21 @@ import { RegistrationComponent } from './registration/registration.component';
     CanvasComponent,
     ChatComponent,
     InfoBarComponent,
+    AdminComponent,
     RegistrationComponent,
+    UsersComponent,
+    ScoresComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatGridListModule,
+    MatTabsModule,
+    MatListModule,
+    MatIconModule,
+    MatButtonModule,
+    MatSelectModule,
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -42,8 +58,9 @@ import { RegistrationComponent } from './registration/registration.component';
     MatCardModule,
     MatButtonModule,
     HttpClientModule,
+    MatTableModule
   ],
   providers: [],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

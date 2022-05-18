@@ -1,7 +1,7 @@
 import { User } from "./User";
 
-export interface UserHistory {
-    id: number,
+export interface History {
+    id: number | null,
     user: User,
     score: number,
     date: Date

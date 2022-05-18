@@ -10,7 +10,7 @@ const router = Router();
 const userdao = new UserDao();
 
 export function getRouter(): Router {
-  router.post("/validateUser", async function (req, res) {
+  router.post("/validate", async function (req, res) {
     const user: User = req.body.User;
     userdao
       .getLoginUserId(user)
@@ -31,7 +31,7 @@ export function getRouter(): Router {
       });
   });
 
-  router.post("/addUser", async function (req, res) {
+  router.post("/add", async function (req, res) {
     const user: User = req.body.User;
 
     userdao
@@ -44,7 +44,7 @@ export function getRouter(): Router {
       });
   });
 
-  router.get("/getUsers", async function (req, res) {
+  router.get("/get", async function (req, res) {
     userdao.getAllUserNameAndId()
       .then(function (users: User[]) {
         console.log(users);
