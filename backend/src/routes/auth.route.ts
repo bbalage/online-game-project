@@ -3,11 +3,13 @@ import * as fs from "fs";
 import jwt from "jsonwebtoken";
 import { UserDao } from "../database/UserDAO";
 import { User } from "../model/User";
+import { ActiveUserService } from "../websocket/activeUser-service";
 
 const RSA_PRIVATE_KEY = fs.readFileSync("src/keys/jwtRS256.key");
 const bearerExpirationTimeSeconds = 7200;
 const router = Router();
 const userdao = new UserDao();
+const activeUserService:ActiveUserService=new ActiveUserService();
 
 export function getRouter(): Router {
   router.post("/validate", async function (req, res) {
@@ -20,7 +22,9 @@ export function getRouter(): Router {
           expiresIn: bearerExpirationTimeSeconds,
           subject: rowId.toString(),
         });
-
+        ///////This hack is because of token based identification
+        //activeUserService.addUser(jwtBearerToken,bearerExpirationTimeSeconds,user);
+        ///End of this hack 
         res.status(200).json({
           idToken: jwtBearerToken,
           expiresIn: bearerExpirationTimeSeconds,
