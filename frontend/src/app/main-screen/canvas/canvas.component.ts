@@ -1,4 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { GameService } from 'src/app/services/game.service';
 import { WebSocketService, WSMessageGame } from 'src/app/services/websocket.service';
 
 @Component({
@@ -7,11 +9,15 @@ import { WebSocketService, WSMessageGame } from 'src/app/services/websocket.serv
   styleUrls: ['./canvas.component.css']
 })
 
-export class CanvasComponent implements OnInit {
+export class CanvasComponent implements OnInit, AfterViewInit {
 
-  @ViewChild('sceneCanvas') private canvas!: HTMLCanvasElement;
+  @ViewChild('canvas', { static: true }) private canvas!: ElementRef<HTMLCanvasElement>;
+  private ctx !: CanvasRenderingContext2D;
 
-  constructor(private webSocketService: WebSocketService) {
+  constructor(
+    private webSocketService: WebSocketService,
+    private gameService: GameService,
+    private snackBar: MatSnackBar) {
     webSocketService.gameMessages$.subscribe({
       next: (message: WSMessageGame) => this.receiveGameUpdate(message)
     });
@@ -20,8 +26,21 @@ export class CanvasComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  receiveGameUpdate(message: any) {
+  ngAfterViewInit(): void {
+    const ctx = this.canvas.nativeElement.getContext("2d");
+    if (ctx !== null) {
+      this.ctx = ctx;
+    } else {
+      this.snackBarMessage("Could not load context!");
+    }
+  }
 
+  private snackBarMessage(message: string) {
+    this.snackBar.open(message, 'Dismiss');
+  }
+
+  receiveGameUpdate(message: any) {
+    this.gameService.updateGame(message);
   }
 
 
