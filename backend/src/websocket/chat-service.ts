@@ -16,8 +16,7 @@ export class ChatService {
                 timestamp: new Date()
             },
             data: {
-                // text: message.data.text
-                text: "Text"
+                text: message.data.text
             }
         });
     }
