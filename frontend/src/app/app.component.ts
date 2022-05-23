@@ -9,7 +9,4 @@ export class AppComponent {
   title = 'ang-start';
 
   constructor() { };
-
-  sendMessage() {
-  }
 }

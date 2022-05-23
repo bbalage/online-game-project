@@ -9,9 +9,8 @@ const RSA_PRIVATE_KEY = fs.readFileSync("src/keys/jwtRS256.key");
 const bearerExpirationTimeSeconds = 7200;
 const router = Router();
 const userdao = new UserDao();
-const activeUserService:ActiveUserService=new ActiveUserService();
 
-export function getRouter(): Router {
+export function getRouter(activeUserService: ActiveUserService): Router {
   router.post("/validate", async function (req, res) {
     const user: User = req.body.User;
     userdao
@@ -22,9 +21,7 @@ export function getRouter(): Router {
           expiresIn: bearerExpirationTimeSeconds,
           subject: rowId.toString(),
         });
-        ///////This hack is because of token based identification
-        //activeUserService.addUser(jwtBearerToken,bearerExpirationTimeSeconds,user);
-        ///End of this hack 
+        activeUserService.addUser(jwtBearerToken, bearerExpirationTimeSeconds, user);
         res.status(200).json({
           idToken: jwtBearerToken,
           expiresIn: bearerExpirationTimeSeconds,

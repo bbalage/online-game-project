@@ -1,43 +1,14 @@
 import * as WebSocket from 'ws';
 import * as http from 'http';
-import { ChatService } from './chat-service';
 import { Subject } from 'rxjs';
-
-export enum MessageType {
-    RegisterUser = 1,
-    ChatMessage,
-    GameStatus,
-}
-
-export interface WSMessageReceived {
-    header: {
-        type: MessageType,
-        userId: number,
-        timestamp: Date
-    }
-    data?: any
-}
-
-export interface WSMessageChat {
-    header: {
-        userId: number,
-        timestamp: Date
-    }
-    data?: any
-}
-
-export interface WSMessageSend {
-    header: {
-        type: MessageType,
-        timestamp: Date
-    }
-    data?: any
-}
+import { MessageType, WSMessageChatReceived, WSMessageGameReceived, WSMessageReceived, WSMessageSend } from '../model/WSMessages';
 
 export class WebSocketService {
 
     ws!: WebSocket.Server;
-    public readonly chatMessages$ = new Subject<WSMessageChat>();
+    public readonly chatMessages$ = new Subject<WSMessageChatReceived>();
+    public readonly gameMessages$ = new Subject<WSMessageGameReceived>();
+    public readonly tankRegisterMessages$ = new Subject<WSMessageReceived>();
 
     constructor(server: http.Server) {
         this.initWebSocket(server);
@@ -50,17 +21,36 @@ export class WebSocketService {
 
             ws.onmessage = (message: WebSocket.MessageEvent) => {
                 const msg = JSON.parse(message.data.toString()) as WSMessageReceived;
+                // TODO: Check jwt token! If token is invalid, send message to exit user!
                 switch (msg.header.type) {
-                    // TODO: Do actual registration of user, and use this registration!
-                    case MessageType.RegisterUser:
-                        console.log("Registering user: %s", msg.header.userId);
+                    case MessageType.RegisterTank:
+                        console.log("Handling tank registering message " + msg.header.timestamp);
+                        this.tankRegisterMessages$.next(msg);
                         break;
                     case MessageType.ChatMessage:
-                        console.log("Handling chat message: %s", msg.header.userId);
-                        this.chatMessages$.next(msg);
+                        console.log("Handling chat message " + msg.header.timestamp);
+                        if (msg.data && msg.data.text) {
+                            this.chatMessages$.next({
+                                header: msg.header,
+                                data: {
+                                    text: msg.data.text
+                                }
+                            });
+                        }
                         break;
                     case MessageType.GameStatus:
-                        console.log("Handling new game status: %s", msg.header.userId);
+                        console.log("Handling new game status " + msg.header.timestamp);
+                        if (msg.data) {
+                            this.gameMessages$.next({
+                                header: msg.header,
+                                data: {
+                                    x: msg.data.x,
+                                    y: msg.data.y,
+                                    dir: msg.data.dir,
+                                    shot: msg.data.shot
+                                }
+                            });
+                        }
                         break;
                 }
             };
@@ -78,6 +68,7 @@ export class WebSocketService {
 
     // TODO: Use clients parameter to send only to specific clients. Possibly userId would be better for this?
     public send(message: WSMessageSend, clients?: WebSocket.WebSocket) {
+        console.log("Sending message of type: " + message.header.type);
         this.ws.clients.forEach((client) => {
             client.send(JSON.stringify(message));
         });

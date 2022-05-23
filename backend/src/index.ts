@@ -4,10 +4,11 @@ import { UserDao } from './database/UserDAO';
 import { UserHistoryDAO } from './database/UserHistoryDAO';
 import { ChatService } from './websocket/chat-service';
 import { WebSocketService } from './websocket/websocket-service';
-import * as WebSocket from "ws";
-import { getRouter } from "./routes/auth.route";
+import { getRouter as getUsersRouter } from "./routes/auth.route";
 import cors from "cors";
 import { getHistoryRouter } from "./routes/history.route";
+import { GameService } from './websocket/game-service';
+import { ActiveUserService } from './websocket/activeUser-service';
 
 const app = express();
 
@@ -26,10 +27,12 @@ app.use(express.json());
 //start our server
 const port: number = 3000;
 
+const activeUserService: ActiveUserService = new ActiveUserService();
 const webSocketService = new WebSocketService(server);
-const chatService = new ChatService(webSocketService);
+const chatService = new ChatService(webSocketService, activeUserService);
+const gameService = new GameService(webSocketService);
 server.listen(port, () => {
   console.log("Listening on " + port);
-  app.use("/users", getRouter());
+  app.use("/users", getUsersRouter(activeUserService));
   app.use("/histories", getHistoryRouter());
 });

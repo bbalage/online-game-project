@@ -26,6 +26,7 @@ import { RegistrationComponent } from './registration/registration.component';
 import { MatTableModule } from '@angular/material/table';
 import { UsersComponent } from './admin/users/users.component';
 import { ScoresComponent } from './admin/scores/scores.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -58,7 +59,8 @@ import { ScoresComponent } from './admin/scores/scores.component';
     MatCardModule,
     MatButtonModule,
     HttpClientModule,
-    MatTableModule
+    MatTableModule,
+    MatSnackBarModule
   ],
   providers: [],
   bootstrap: [AppComponent],

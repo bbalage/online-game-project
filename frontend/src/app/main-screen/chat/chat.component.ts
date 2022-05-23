@@ -1,6 +1,8 @@
 import { Component, Directive, OnChanges, OnInit } from '@angular/core';
-import { WebSocketService, WSMessageChat, WSMessageType } from 'src/app/services/websocket.service';
+import { WebSocketService } from 'src/app/services/websocket.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { WSMessageChatReceived, WSMessageType } from 'src/app/models/WSMessages';
+import { ID_TOKEN_KEY } from 'src/app/services/user.service';
 
 interface ChatBubble {
   time: Date,
@@ -14,7 +16,7 @@ interface ChatBubble {
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit {
-  currentUsername: string = "NoUserName"; 
+  currentUsername: string = "NoUserName";
   chatBubbles: ChatBubble[] = [];
   messageForm = new FormGroup({
     message: new FormControl('')
@@ -23,54 +25,51 @@ export class ChatComponent implements OnInit {
 
   constructor(private webSocketService: WebSocketService) {
     webSocketService.chatMessages$.subscribe({
-      next: (message: WSMessageChat) => this.receiveChatMessage(message)
+      next: (message: WSMessageChatReceived) => this.receiveChatMessage(message)
     });
   }
 
   ngOnInit(): void {
-    //Mocked
-    this.currentUsername="Paul";
+    // TODO: Mocked
+    this.currentUsername = "Paul";
 
   }
 
-  private receiveChatMessage(message: WSMessageChat) {
+  private receiveChatMessage(message: WSMessageChatReceived) {
     this.chatBubbles.push({
       text: message.data.text,
-      //Mocked
-      username: Math.floor(Math.random()*2)==0 ? this.currentUsername : "Dummyuser",
-      //Mocked
-      time: new Date()
+      username: message.data.username,
+      time: message.header.timestamp
     });
-
   }
 
-  public scrollDown(){
+  public scrollDown() {
     const scroll = document.getElementById("scroll");
-    if (scroll!=null)
+    if (scroll != null)
       scroll.scrollTop = scroll.scrollHeight;
-      console.log(scroll?.scrollTop);
+    console.log(scroll?.scrollTop);
   }
 
-  onKeyPress(event:KeyboardEvent){
-    if (event.code==='Enter' && event.shiftKey==false){
+  onKeyPress(event: KeyboardEvent) {
+    if (event.code === 'Enter' && event.shiftKey == false) {
       this.sendChatMessage();
     }
   }
 
   sendChatMessage() {
     const message = this.messageForm.controls["message"].value
-    if (message!=''){
-    this.webSocketService.sendMessage({
-      header: {
-        userId: 0,
-        type: WSMessageType.ChatMessage,
-        timestamp: new Date()
-      },
-      data: {
-        text: message
-      }
-    });
-    this.messageForm.setValue({message: ''});
-     }
+    if (message != '') {
+      this.webSocketService.sendMessage({
+        header: {
+          jwtToken: sessionStorage.getItem(ID_TOKEN_KEY),
+          type: WSMessageType.ChatMessage,
+          timestamp: new Date()
+        },
+        data: {
+          text: message
+        }
+      });
+      this.messageForm.setValue({ message: '' });
+    }
   }
 }
