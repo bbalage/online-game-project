@@ -1,40 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import { AnimationStatus } from '../models/AnimationStatus';
+import { WSMessageChatReceived, WSMessageGameReceived, WSMessageSend, WSMessageType } from '../models/WSMessages';
 
 // TODO: Move to config file
 const CHAT_URL: string = "ws://localhost:3000";
-
-export enum WSMessageType {
-  RegisterUser = 1,
-  ChatMessage,
-  GameStatus,
-}
-
-export interface WSMessageSend {
-  header: {
-    type: WSMessageType,
-    userId: number,
-    timestamp: Date
-  }
-  data?: any
-}
-
-export interface WSMessageChat {
-  header: {
-    userId: number,
-    timestamp: Date
-  }
-  data?: any
-}
-
-export interface WSMessageGame {
-  header: {
-    timestamp: Date
-  }
-  data: [
-    { pos: { x: number, y: number } }
-  ]
-}
 
 @Injectable({
   providedIn: 'root'
@@ -43,22 +13,11 @@ export class WebSocketService {
 
   private ws = new WebSocket(CHAT_URL);
   userId!: number;
-  public readonly chatMessages$ = new Subject<WSMessageChat>();
-  public readonly gameMessages$ = new Subject<WSMessageGame>();
+  public readonly chatMessages$ = new Subject<WSMessageChatReceived>();
+  public readonly gameMessages$ = new Subject<WSMessageGameReceived>();
 
   constructor() {
     this.initWebSocket();
-  }
-
-  setUser(userId: number) {
-    this.userId = userId;
-    this.sendMessage({
-      header: {
-        type: WSMessageType.RegisterUser,
-        userId: userId,
-        timestamp: new Date()
-      }
-    })
   }
 
   sendMessage(message: WSMessageSend) {
@@ -69,7 +28,6 @@ export class WebSocketService {
   private initWebSocket() {
     this.ws.onopen = (ev: any) => {
       console.log("Connection opened.");
-      this.setUser(1);
     }
     this.ws.onmessage = (messageEvent: any) => {
       console.log(`Received message: ${messageEvent}`);

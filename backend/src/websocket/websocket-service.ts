@@ -1,43 +1,13 @@
 import * as WebSocket from 'ws';
 import * as http from 'http';
-import { ChatService } from './chat-service';
 import { Subject } from 'rxjs';
-
-export enum MessageType {
-    RegisterUser = 1,
-    ChatMessage,
-    GameStatus,
-}
-
-export interface WSMessageReceived {
-    header: {
-        type: MessageType,
-        userId: number,
-        timestamp: Date
-    }
-    data?: any
-}
-
-export interface WSMessageChat {
-    header: {
-        userId: number,
-        timestamp: Date
-    }
-    data?: any
-}
-
-export interface WSMessageSend {
-    header: {
-        type: MessageType,
-        timestamp: Date
-    }
-    data?: any
-}
+import { MessageType, WSMessageChatReceived, WSMessageGameReceived, WSMessageReceived, WSMessageSend } from '../model/WSMessages';
 
 export class WebSocketService {
 
     ws!: WebSocket.Server;
-    public readonly chatMessages$ = new Subject<WSMessageChat>();
+    public readonly chatMessages$ = new Subject<WSMessageChatReceived>();
+    public readonly gameMessages$ = new Subject<WSMessageGameReceived>();
 
     constructor(server: http.Server) {
         this.initWebSocket(server);
@@ -53,14 +23,22 @@ export class WebSocketService {
                 switch (msg.header.type) {
                     // TODO: Do actual registration of user, and use this registration!
                     case MessageType.RegisterUser:
-                        console.log("Registering user: %s", msg.header.userId);
+                        console.log("Registering user: %s", msg.header.jwtToken);
                         break;
                     case MessageType.ChatMessage:
-                        console.log("Handling chat message: %s", msg.header.userId);
-                        this.chatMessages$.next(msg);
+                        console.log("Handling chat message: %s", msg.header.jwtToken);
+                        if (msg.data && msg.data.text) {
+                            this.chatMessages$.next({
+                                header: msg.header,
+                                data: {
+                                    text: msg.data.text
+                                }
+                            });
+                        }
                         break;
                     case MessageType.GameStatus:
-                        console.log("Handling new game status: %s", msg.header.userId);
+                        console.log("Handling new game status: %s", msg.header.jwtToken);
+                        this.gameMessages$.next(msg);
                         break;
                 }
             };

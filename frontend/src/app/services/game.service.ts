@@ -1,24 +1,27 @@
 import { Injectable } from '@angular/core';
 import { AnimationStatus } from '../models/AnimationStatus';
+import { WSMessageGameReceived } from '../models/WSMessages';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameService {
 
+  private animationStatus: AnimationStatus | null = null;
+  private defeated: boolean = false;
+
   constructor() { }
 
-  updateGame(gameMessage: any) {
-
+  isDefeated() {
+    return this.defeated;
   }
 
-  retrieveGameData() {
-
+  updateGame(gameMessage: WSMessageGameReceived) {
+    this.animationStatus = gameMessage.data.status;
+    this.defeated = gameMessage.data.defeated;
   }
 
-  retrieveGameAnimationStatus(): AnimationStatus {
-    return {
-      tanks: [{ x: 10, y: 10, dir: 0, hp: 50 }]
-    };
+  retrieveGameAnimationStatus(): AnimationStatus | null {
+    return this.animationStatus;
   }
 }

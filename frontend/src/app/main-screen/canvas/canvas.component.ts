@@ -1,7 +1,9 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, NgZone, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TankStatus, TankDirection } from 'src/app/models/AnimationStatus';
+import { WSMessageGameReceived } from 'src/app/models/WSMessages';
 import { GameService } from 'src/app/services/game.service';
-import { WebSocketService, WSMessageGame } from 'src/app/services/websocket.service';
+import { WebSocketService } from 'src/app/services/websocket.service';
 
 @Component({
   selector: 'app-canvas',
@@ -13,14 +15,17 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
   @ViewChild('canvas', { static: true }) private canvas!: ElementRef<HTMLCanvasElement>;
   private ctx !: CanvasRenderingContext2D;
-  private tankSpriteUp!: any;
+  private tankDirectionMap!: Map<TankDirection, any>;
+  // TODO: Purpose is to make chat and game events coexist. Implement!
+  private playMode: boolean = true;
 
   constructor(
     private webSocketService: WebSocketService,
+    private ngZone: NgZone,
     private gameService: GameService,
     private snackBar: MatSnackBar) {
     webSocketService.gameMessages$.subscribe({
-      next: (message: WSMessageGame) => this.receiveGameUpdate(message)
+      next: (message: WSMessageGameReceived) => this.receiveGameUpdate(message)
     });
 
   }
@@ -35,17 +40,15 @@ export class CanvasComponent implements OnInit, AfterViewInit {
       return;
     }
     this.ctx = ctx;
-    this.tankSpriteUp = new Image();
-    this.tankSpriteUp.src = "/assets/sprites/tank1.png";
-    this.tankSpriteUp.onload = () => { this.ctx.drawImage(this.tankSpriteUp, 0, 0, 20, 20); }
-    this.animate();
+    this.initializeGameSetting();
+    this.ngZone.runOutsideAngular(() => this.animate());
   }
 
   private snackBarMessage(message: string) {
     this.snackBar.open(message, 'Dismiss');
   }
 
-  receiveGameUpdate(message: any) {
+  receiveGameUpdate(message: WSMessageGameReceived) {
     this.gameService.updateGame(message);
   }
 
@@ -53,10 +56,48 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     const id = requestAnimationFrame(() => this.animate());
     this.ctx.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
     const animationStatus = this.gameService.retrieveGameAnimationStatus();
+    if (!animationStatus) {
+      return;
+    }
     for (let tank of animationStatus.tanks) {
-      this.ctx.drawImage(this.tankSpriteUp, tank.x, tank.y, 20, 20);
+      this.drawTank(tank);
     }
   }
 
+  private drawTank(tank: TankStatus) {
+    this.ctx.drawImage(this.tankDirectionMap.get(tank.dir), tank.x, tank.y, 15, 15);
+  }
 
+  private initializeGameSetting() {
+    this.tankDirectionMap = new Map<TankDirection, any>([
+      [TankDirection.UP, new Image()],
+      [TankDirection.RIGHT, new Image()],
+      [TankDirection.DOWN, new Image()],
+      [TankDirection.LEFT, new Image()]
+    ]);
+    this.tankDirectionMap.get(TankDirection.UP).src = "/assets/sprites/tank1.png";
+    this.tankDirectionMap.get(TankDirection.RIGHT).src = "/assets/sprites/tank2.png";
+    this.tankDirectionMap.get(TankDirection.DOWN).src = "/assets/sprites/tank3.png";
+    this.tankDirectionMap.get(TankDirection.LEFT).src = "/assets/sprites/tank4.png";
+
+    document.addEventListener("keydown", (e) => this.keyDownHandler(e), false);
+    document.addEventListener("keyup", (e) => this.keyUpHandler(e), false);
+    // this.canvas.nativeElement.addEventListener("mousemove", (e) => this.mouseMoveHandler(e), false);
+  }
+
+  private keyDownHandler(e: Event) {
+    if (this.playMode) {
+      console.log(e);
+    }
+  }
+
+  private keyUpHandler(e: Event) {
+    if (this.playMode) {
+      console.log(e);
+    }
+  }
+
+  private mouseMoveHandler(e: Event) {
+    console.log(e);
+  }
 }
