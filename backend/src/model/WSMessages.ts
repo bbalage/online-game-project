@@ -1,7 +1,7 @@
-import { AnimationStatus } from "./GameStatus"
+import { AnimationStatus, TankDirection } from "./GameStatus"
 
 export enum MessageType {
-    RegisterUser = 1,
+    RegisterTank = 1,
     ChatMessage,
     GameStatus,
 }
@@ -45,11 +45,13 @@ export interface WSMessageChatSend {
 
 export interface WSMessageGameReceived {
     header: {
+        jwtToken: string,
         timestamp: Date
     },
-    data?: {
+    data: {
         x: number,
         y: number,
+        dir: TankDirection,
         shot?: {
             posX: number,
             posY: number,

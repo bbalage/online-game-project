@@ -1,5 +1,15 @@
+export const TankDescriptor = {
+    width: 15,
+    height: 15
+}
+
+export const MapDescriptor = {
+    width: 200,
+    height: 100
+}
+
 export enum TankDirection {
-    UP, RIGHT, DOWN, LEFT
+    UP = 1, RIGHT, DOWN, LEFT
 }
 
 export interface TankStatus {
@@ -11,4 +21,8 @@ export interface TankStatus {
 
 export interface AnimationStatus {
     tanks: TankStatus[];
+}
+
+export interface GameStatus {
+    tanks: Map<string, TankStatus>
 }

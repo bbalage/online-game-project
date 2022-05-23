@@ -5,11 +5,11 @@ import { CanActivate, Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthorizationGuard implements CanActivate {
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   canActivate(): boolean {
-    const expires_at = localStorage.getItem('expires_at');
-    
+    const expires_at = sessionStorage.getItem('expires_at');
+
     if (expires_at == null || new Date() > new Date(expires_at)) {
       this.router.navigateByUrl('/');
       return false;

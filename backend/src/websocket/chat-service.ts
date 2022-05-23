@@ -7,13 +7,14 @@ export class ChatService {
     constructor(
         private websocketService: WebSocketService,
         private activeUserService: ActiveUserService) {
-        console.log("Constructed chatservice.");
+        console.log("Constructed chat-service.");
         websocketService.chatMessages$.subscribe({
             next: (message: WSMessageChatReceived) => this.handleMessage(message)
         });
     }
 
     handleMessage(message: WSMessageChatReceived) {
+        console.log("chat-service handling message.");
         const sentMessage = {
             header: {
                 type: MessageType.ChatMessage,

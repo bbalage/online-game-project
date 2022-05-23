@@ -6,6 +6,8 @@ import { catchError, map } from 'rxjs/operators';
 import { User } from '../models/User';
 import { BaseService } from './base.service';
 
+export const ID_TOKEN_KEY = "id_token";
+
 @Injectable({
   providedIn: 'root',
 })
@@ -34,12 +36,12 @@ export class UserService extends BaseService {
       now.setSeconds(now.getSeconds() + authResult.expiresIn)
     );
 
-    localStorage.setItem('id_token', authResult.idToken);
-    localStorage.setItem('expires_at', expiresAt.toISOString());
+    sessionStorage.setItem(ID_TOKEN_KEY, authResult.idToken);
+    sessionStorage.setItem('expires_at', expiresAt.toISOString());
   }
 
   private deleteSession() {
-    localStorage.clear();
+    sessionStorage.clear();
   }
 
   public addUser(User: User) {

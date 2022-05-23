@@ -2,6 +2,7 @@ import { Component, Directive, OnChanges, OnInit } from '@angular/core';
 import { WebSocketService } from 'src/app/services/websocket.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { WSMessageChatReceived, WSMessageType } from 'src/app/models/WSMessages';
+import { ID_TOKEN_KEY } from 'src/app/services/user.service';
 
 interface ChatBubble {
   time: Date,
@@ -60,7 +61,7 @@ export class ChatComponent implements OnInit {
     if (message != '') {
       this.webSocketService.sendMessage({
         header: {
-          jwtToken: localStorage.getItem("id_token"),
+          jwtToken: sessionStorage.getItem(ID_TOKEN_KEY),
           type: WSMessageType.ChatMessage,
           timestamp: new Date()
         },

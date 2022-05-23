@@ -15,23 +15,26 @@ export class WebSocketService {
   userId!: number;
   public readonly chatMessages$ = new Subject<WSMessageChatReceived>();
   public readonly gameMessages$ = new Subject<WSMessageGameReceived>();
+  public readonly opened$ = new Subject<undefined>();
 
   constructor() {
     this.initWebSocket();
   }
 
   sendMessage(message: WSMessageSend) {
-    console.log(`Sending message:\n${message}`);
-    this.ws.send(JSON.stringify(message));
+    const sendJSON = JSON.stringify(message);
+    this.ws.send(sendJSON);
+    console.log("Sent message.");
   }
 
   private initWebSocket() {
     this.ws.onopen = (ev: any) => {
+      this.opened$.next(undefined);
       console.log("Connection opened.");
     }
     this.ws.onmessage = (messageEvent: any) => {
-      console.log(`Received message: ${messageEvent}`);
       const msg = JSON.parse(messageEvent.data)
+      console.log(`Received message of type: ${msg.header.type}`);
       switch (msg.header.type) {
         case WSMessageType.ChatMessage:
           this.chatMessages$.next(msg);

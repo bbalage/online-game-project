@@ -1,7 +1,7 @@
-import { AnimationStatus } from "./AnimationStatus"
+import { AnimationStatus, TankDirection } from "./AnimationStatus"
 
 export enum WSMessageType {
-    RegisterUser = 1,
+    RegisterTank = 1,
     ChatMessage,
     GameStatus,
 }
@@ -53,6 +53,7 @@ export interface WSMessageGameSend {
     data: {
         x: number,
         y: number,
+        dir: TankDirection,
         shot?: {
             posX: number,
             posY: number,

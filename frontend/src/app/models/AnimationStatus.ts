@@ -1,5 +1,5 @@
 export enum TankDirection {
-    UP, RIGHT, DOWN, LEFT
+    UP = 1, RIGHT, DOWN, LEFT
 }
 
 export interface TankStatus {

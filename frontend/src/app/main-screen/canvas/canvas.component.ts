@@ -27,6 +27,9 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     webSocketService.gameMessages$.subscribe({
       next: (message: WSMessageGameReceived) => this.receiveGameUpdate(message)
     });
+    webSocketService.opened$.subscribe({
+      next: (v: undefined) => this.gameService.registerTank()
+    })
 
   }
 
@@ -85,9 +88,17 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     // this.canvas.nativeElement.addEventListener("mousemove", (e) => this.mouseMoveHandler(e), false);
   }
 
-  private keyDownHandler(e: Event) {
+  private keyDownHandler(e: any) {
     if (this.playMode) {
-      console.log(e);
+      if (e.key === "w") {
+        this.gameService.moveTank(TankDirection.UP);
+      } else if (e.key === "d") {
+        this.gameService.moveTank(TankDirection.RIGHT);
+      } else if (e.key === "s") {
+        this.gameService.moveTank(TankDirection.DOWN);
+      } else if (e.key === "a") {
+        this.gameService.moveTank(TankDirection.LEFT);
+      }
     }
   }
 
