@@ -103,6 +103,22 @@ export class UserDao {
         })
     }
 
+    deleteUserById(id: number):Promise<boolean>{
+        let prepared: Statement = getConnection().prepare("DELETE FROM user where id=?");
+        return new Promise(function (resolve,reject){
+            prepared.run(id, function(err: Error| null){
+                if (!err){
+                    console.log("User "+id+" has been deleted");
+                    resolve(true);
+                }
+                else{
+                    console.log("No such a user");
+                    reject(false);
+                }
+            })
+        })
+    }
+
 
 
 
