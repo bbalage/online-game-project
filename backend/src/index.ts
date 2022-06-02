@@ -9,6 +9,7 @@ import cors from "cors";
 import { getHistoryRouter } from "./routes/history.route";
 import { GameService } from './websocket/game-service';
 import { ActiveUserService } from './websocket/activeUser-service';
+import { Game } from './gameloop/game';
 
 const app = express();
 
@@ -31,6 +32,9 @@ const activeUserService: ActiveUserService = new ActiveUserService();
 const webSocketService = new WebSocketService(server);
 const chatService = new ChatService(webSocketService, activeUserService);
 const gameService = new GameService(webSocketService);
+const game = new Game();
+const fps = 1000 / 30; // milliseconds / rate
+setInterval(() => game.loop(), fps);
 server.listen(port, () => {
   console.log("Listening on " + port);
   app.use("/users", getUsersRouter(activeUserService));

@@ -43,7 +43,6 @@ export class GameService {
         const animationStatus: AnimationStatus = { tanks: new Array<TankStatus>(this.gameStatus.tanks.size) };
         let i = 0;
         for (let tank of this.gameStatus.tanks.values()) {
-            console.log(`Adding tank ${i}`);
             animationStatus.tanks[i] = tank;
             i++;
         }
