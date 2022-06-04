@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { AnimationStatus } from '../models/AnimationStatus';
-import { WSMessageChatReceived, WSMessageGameReceived, WSMessageSend, WSMessageType } from '../models/WSMessages';
+import { WSMessageChatReceived, WSMessageGameReceived, WSMessageSend, WSReceivedMessageType } from '../models/WSMessages';
 
 // TODO: Move to config file
 const CHAT_URL: string = "ws://localhost:3000";
@@ -24,7 +24,6 @@ export class WebSocketService {
   sendMessage(message: WSMessageSend) {
     const sendJSON = JSON.stringify(message);
     this.ws.send(sendJSON);
-    console.log("Sent message.");
   }
 
   private initWebSocket() {
@@ -34,12 +33,11 @@ export class WebSocketService {
     }
     this.ws.onmessage = (messageEvent: any) => {
       const msg = JSON.parse(messageEvent.data)
-      console.log(`Received message of type: ${msg.header.type}`);
       switch (msg.header.type) {
-        case WSMessageType.ChatMessage:
+        case WSReceivedMessageType.ChatMessage:
           this.chatMessages$.next(msg);
           break;
-        case WSMessageType.GameStatus:
+        case WSReceivedMessageType.GameStatus:
           this.gameMessages$.next(msg);
           break;
       }

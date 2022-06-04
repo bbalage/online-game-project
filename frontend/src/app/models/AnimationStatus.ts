@@ -9,6 +9,12 @@ export interface TankStatus {
     hp: number;
 }
 
+export interface BulletStatus {
+    x: number,
+    y: number
+}
+
 export interface AnimationStatus {
-    tanks: TankStatus[];
+    tanks: TankStatus[],
+    bullets: BulletStatus[]
 }

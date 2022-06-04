@@ -1,14 +1,20 @@
 import { AnimationStatus, TankDirection } from "./AnimationStatus"
 
-export enum WSMessageType {
+export enum WSSendMessageType {
     RegisterTank = 1,
-    ChatMessage,
+    MoveTank,
+    ShootCannon,
+    ChatMessage
+}
+
+export enum WSReceivedMessageType {
     GameStatus,
+    ChatMessage
 }
 
 export interface WSMessageSend {
     header: {
-        type: WSMessageType,
+        type: WSSendMessageType,
         jwtToken: string | null,
         timestamp: Date
     }
@@ -45,7 +51,7 @@ export interface WSMessageGameReceived {
     }
 }
 
-export interface WSMessageGameSend {
+export interface WSMessageMoveTank {
     header: {
         jwtToken: string | null,
         timestamp: Date
@@ -54,11 +60,12 @@ export interface WSMessageGameSend {
         x: number,
         y: number,
         dir: TankDirection,
-        shot?: {
-            posX: number,
-            posY: number,
-            vX: number,
-            vY: number
-        }
+    }
+}
+
+export interface WSMessageShootCannon {
+    header: {
+        jwtToken: string | null,
+        timestamp: Date
     }
 }

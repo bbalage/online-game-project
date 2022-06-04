@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, NgZone, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TankStatus, TankDirection } from 'src/app/models/AnimationStatus';
+import { TankStatus, TankDirection, BulletStatus } from 'src/app/models/AnimationStatus';
 import { WSMessageGameReceived } from 'src/app/models/WSMessages';
 import { GameService } from 'src/app/services/game.service';
 import { WebSocketService } from 'src/app/services/websocket.service';
@@ -65,10 +65,20 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     for (let tank of animationStatus.tanks) {
       this.drawTank(tank);
     }
+    for (let bullet of animationStatus.bullets) {
+      this.drawBullet(bullet);
+    }
   }
 
   private drawTank(tank: TankStatus) {
     this.ctx.drawImage(this.tankDirectionMap.get(tank.dir), tank.x, tank.y, 15, 15);
+  }
+
+  private drawBullet(bullet: BulletStatus) {
+    this.ctx.beginPath();
+    this.ctx.arc(bullet.x, bullet.y, 2, 0, 2 * Math.PI, false);
+    this.ctx.fillStyle = "red";
+    this.ctx.fill();
   }
 
   private initializeGameSetting() {
@@ -98,6 +108,8 @@ export class CanvasComponent implements OnInit, AfterViewInit {
         this.gameService.moveTank(TankDirection.DOWN);
       } else if (e.key === "a") {
         this.gameService.moveTank(TankDirection.LEFT);
+      } else if (e.key === " ") {
+        this.gameService.shootCannon();
       }
     }
   }

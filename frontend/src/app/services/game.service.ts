@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AnimationStatus, TankDirection, TankStatus } from '../models/AnimationStatus';
-import { WSMessageGameReceived, WSMessageGameSend, WSMessageType } from '../models/WSMessages';
+import { WSMessageGameReceived, WSMessageMoveTank, WSSendMessageType } from '../models/WSMessages';
 import { ID_TOKEN_KEY } from './user.service';
 import { WebSocketService } from './websocket.service';
 
@@ -19,7 +19,7 @@ export class GameService {
     this.webSocketService.sendMessage({
       header: {
         jwtToken: sessionStorage.getItem(ID_TOKEN_KEY),
-        type: WSMessageType.RegisterTank,
+        type: WSSendMessageType.RegisterTank,
         timestamp: new Date()
       }
     });
@@ -45,12 +45,22 @@ export class GameService {
       header: {
         jwtToken: sessionStorage.getItem(ID_TOKEN_KEY),
         timestamp: new Date(),
-        type: WSMessageType.GameStatus
+        type: WSSendMessageType.MoveTank
       },
       data: {
         x: x,
         y: y,
         dir: dir
+      }
+    });
+  }
+
+  shootCannon() {
+    this.webSocketService.sendMessage({
+      header: {
+        jwtToken: sessionStorage.getItem(ID_TOKEN_KEY),
+        timestamp: new Date(),
+        type: WSSendMessageType.ShootCannon
       }
     });
   }
@@ -61,9 +71,6 @@ export class GameService {
 
   updateGame(gameMessage: WSMessageGameReceived) {
     this.animationStatus = gameMessage.data.status;
-    for (let tank of this.animationStatus.tanks) {
-      console.log(`Tank position ${tank.x} : ${tank.y}`);
-    }
     this.defeated = gameMessage.data.defeated;
   }
 
