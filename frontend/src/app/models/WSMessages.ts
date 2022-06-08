@@ -8,8 +8,9 @@ export enum WSSendMessageType {
 }
 
 export enum WSReceivedMessageType {
-    GameStatus,
-    ChatMessage
+    GameStatus = 1,
+    ChatMessage,
+    Logout
 }
 
 export interface WSMessageSend {
@@ -66,6 +67,13 @@ export interface WSMessageMoveTank {
 export interface WSMessageShootCannon {
     header: {
         jwtToken: string | null,
+        timestamp: Date
+    }
+}
+
+export interface WSMessageLogoutReceived {
+    header: {
+        jwtToken: string,
         timestamp: Date
     }
 }

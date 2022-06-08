@@ -1,5 +1,5 @@
 import { last } from 'rxjs';
-import { AnimationStatus, Bullet, BulletStatus, BULLET_SPEED, GameStatus, MapDescriptor, TankDescriptor, TankDirection, TankStatus } from '../model/GameStatus';
+import { AnimationStatus, Bullet, BulletStatus, BULLET_SPEED, DeleteTankCommand, GameStatus, MapDescriptor, TankDescriptor, TankDirection, TankStatus } from '../model/GameStatus';
 import { WSMessageMoveTankReceived, WSMessageRegisterTankReceived, WSMessageShootCannonReceived, WSSendMessageType } from '../model/WSMessages';
 import { WebSocketService } from '../websocket/websocket-service';
 
@@ -47,6 +47,9 @@ export class GameService {
         });
         webSocketService.shootCannonMessages$.subscribe({
             next: (message: WSMessageShootCannonReceived) => this.handleShootCannon(message)
+        });
+        webSocketService.deleteTankCommands$.subscribe({
+            next: (message: DeleteTankCommand) => this.deleteTank(message.token)
         });
     }
 
@@ -125,6 +128,10 @@ export class GameService {
             shotDirection.dx,
             shotDirection.dy
         ));
+    }
+
+    private deleteTank(token:string) {
+        this.gameStatus.tanks.delete(token);
     }
 
     private generateNewTank(): TankStatus {

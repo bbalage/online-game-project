@@ -59,3 +59,7 @@ export interface GameStatus {
     tanks: Map<string, TankStatus>,
     bullets: Bullet[]
 }
+
+export interface DeleteTankCommand {
+    token: string
+}

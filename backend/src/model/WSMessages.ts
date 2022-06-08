@@ -8,8 +8,9 @@ export enum WSRecievedMessageType {
 }
 
 export enum WSSendMessageType {
-    GameStatus,
-    ChatMessage
+    GameStatus = 1,
+    ChatMessage,
+    Logout
 }
 
 export interface WSMessageReceived {

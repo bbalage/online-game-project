@@ -8,8 +8,11 @@ import {
     WSMessageReceived,
     WSMessageSend,
     WSMessageRegisterTankReceived,
-    WSMessageShootCannonReceived
+    WSMessageShootCannonReceived,
+    WSSendMessageType
 } from '../model/WSMessages';
+import { ActiveUserService } from './activeUser-service';
+import { DeleteTankCommand } from '../model/GameStatus';
 
 export class WebSocketService {
 
@@ -18,8 +21,9 @@ export class WebSocketService {
     public readonly tankRegisterMessages$ = new Subject<WSMessageRegisterTankReceived>();
     public readonly moveTankMessages$ = new Subject<WSMessageMoveTankReceived>();
     public readonly shootCannonMessages$ = new Subject<WSMessageShootCannonReceived>();
+    public readonly deleteTankCommands$ = new Subject<DeleteTankCommand>();
 
-    constructor(server: http.Server) {
+    constructor(server: http.Server, private activeUserService: ActiveUserService) {
         this.initWebSocket(server);
     }
 
@@ -30,7 +34,18 @@ export class WebSocketService {
 
             ws.onmessage = (message: WebSocket.MessageEvent) => {
                 const msg = JSON.parse(message.data.toString()) as WSMessageReceived;
-                // TODO: Check jwt token! If token is invalid, send message to exit user!
+                if (msg.header.jwtToken === undefined) {
+                    return;
+                }
+                if (!this.activeUserService.isUserActive(msg.header.jwtToken)) {
+                    this.deleteTankCommands$.next({token: msg.header.jwtToken});
+                    this.send({
+                        header: {
+                            type: WSSendMessageType.Logout,
+                            timestamp: new Date()
+                        }
+                    })
+                }
                 switch (msg.header.type) {
                     case WSRecievedMessageType.RegisterTank:
                         console.log("Handling tank registering message " + msg.header.timestamp);

@@ -30,6 +30,11 @@ export class UserService extends BaseService {
       );
   }
 
+
+  public logoutUser() {
+    sessionStorage.clear();
+  }
+
   private setSession(authResult: any) {
     const now = new Date();
     const expiresAt: Date = new Date(
@@ -38,10 +43,6 @@ export class UserService extends BaseService {
 
     sessionStorage.setItem(ID_TOKEN_KEY, authResult.idToken);
     sessionStorage.setItem('expires_at', expiresAt.toISOString());
-  }
-
-  private deleteSession() {
-    sessionStorage.clear();
   }
 
   public addUser(User: User) {

@@ -29,7 +29,7 @@ app.use(express.json());
 const port: number = 3000;
 
 const activeUserService: ActiveUserService = new ActiveUserService();
-const webSocketService = new WebSocketService(server);
+const webSocketService = new WebSocketService(server, activeUserService);
 const chatService = new ChatService(webSocketService, activeUserService);
 const gameService = new GameService(webSocketService);
 const game = new Game(gameService);

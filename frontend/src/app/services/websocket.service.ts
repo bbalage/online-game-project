@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { AnimationStatus } from '../models/AnimationStatus';
-import { WSMessageChatReceived, WSMessageGameReceived, WSMessageSend, WSReceivedMessageType } from '../models/WSMessages';
+import { WSMessageChatReceived, WSMessageGameReceived, WSMessageLogoutReceived, WSMessageSend, WSReceivedMessageType } from '../models/WSMessages';
 
 // TODO: Move to config file
 const CHAT_URL: string = "ws://localhost:3000";
@@ -15,6 +15,7 @@ export class WebSocketService {
   userId!: number;
   public readonly chatMessages$ = new Subject<WSMessageChatReceived>();
   public readonly gameMessages$ = new Subject<WSMessageGameReceived>();
+  public readonly logoutMessages$ = new Subject<WSMessageLogoutReceived>();
   public readonly opened$ = new Subject<undefined>();
 
   constructor() {
@@ -24,6 +25,10 @@ export class WebSocketService {
   sendMessage(message: WSMessageSend) {
     const sendJSON = JSON.stringify(message);
     this.ws.send(sendJSON);
+  }
+
+  isOpen() : boolean {
+    return this.ws.readyState === this.ws.OPEN;
   }
 
   private initWebSocket() {
@@ -39,6 +44,9 @@ export class WebSocketService {
           break;
         case WSReceivedMessageType.GameStatus:
           this.gameMessages$.next(msg);
+          break;
+        case WSReceivedMessageType.Logout:
+          this.logoutMessages$.next(msg);
           break;
       }
     };

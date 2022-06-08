@@ -24,13 +24,9 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     private ngZone: NgZone,
     private gameService: GameService,
     private snackBar: MatSnackBar) {
-    webSocketService.gameMessages$.subscribe({
-      next: (message: WSMessageGameReceived) => this.receiveGameUpdate(message)
-    });
-    webSocketService.opened$.subscribe({
-      next: (v: undefined) => this.gameService.registerTank()
-    })
-
+      webSocketService.gameMessages$.subscribe({
+        next: (message: WSMessageGameReceived) => this.receiveGameUpdate(message)
+      });
   }
 
   ngOnInit(): void {

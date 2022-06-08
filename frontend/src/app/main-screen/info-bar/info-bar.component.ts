@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { WebSocketService } from 'src/app/services/websocket.service';
 
 @Component({
   selector: 'app-info-bar',
@@ -7,9 +8,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class InfoBarComponent implements OnInit {
 
-  constructor() { }
+  constructor(private webSocketService: WebSocketService) { }
 
   ngOnInit(): void {
+  }
+
+  startPlaying() {
+    if (!this.webSocketService.isOpen()) {
+      
+    } // TODO: Continue!
+    this.webSocketService.opened$.subscribe({
+      next: (v: undefined) => this.gameService.registerTank()
+    })
   }
 
 }
