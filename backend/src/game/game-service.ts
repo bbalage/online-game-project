@@ -1,5 +1,5 @@
 import { last } from 'rxjs';
-import { AnimationStatus, Bullet, BulletStatus, BULLET_SPEED, DeleteTankCommand, GameStatus, MapDescriptor, TankDescriptor, TankDirection, TankStatus } from '../model/GameStatus';
+import { AnimationStatus, Bullet, BulletDescriptor, BulletStatus, BULLET_DAMAGE, BULLET_SPEED, DeleteTankCommand, GameStatus, MapDescriptor, TankDescriptor, TankDirection, TankStatus } from '../model/GameStatus';
 import { WSMessageMoveTankReceived, WSMessageRegisterTankReceived, WSMessageShootCannonReceived, WSSendMessageType } from '../model/WSMessages';
 import { ActiveUserService, TokenSwitch } from '../websocket/activeUser-service';
 import { WebSocketService } from '../websocket/websocket-service';
@@ -27,10 +27,10 @@ export class GameService {
 
     // TODO: Change this once tank size is properly set!
     private tankDirectionShotOffsetMap: Map<TankDirection, ShotOffset> = new Map<TankDirection, ShotOffset>([
-        [TankDirection.UP, { dx: TankDescriptor.width / 2, dy: - 1 }],
-        [TankDirection.RIGHT, { dx: TankDescriptor.width + 1, dy: TankDescriptor.height / 2 }],
-        [TankDirection.DOWN, { dx: TankDescriptor.width / 2, dy: TankDescriptor.height + 1 }],
-        [TankDirection.LEFT, { dx: -1, dy: TankDescriptor.height / 2 }]
+        [TankDirection.UP, { dx: TankDescriptor.side / 2, dy: - 5 }],
+        [TankDirection.RIGHT, { dx: TankDescriptor.side + 1, dy: TankDescriptor.side / 2 }],
+        [TankDirection.DOWN, { dx: TankDescriptor.side / 2, dy: TankDescriptor.side + 1 }],
+        [TankDirection.LEFT, { dx: -5, dy: TankDescriptor.side / 2 }]
     ]);
 
     private gameStatus: GameStatus = {
@@ -173,9 +173,17 @@ export class GameService {
     }
 
     private checkBulletHit(bullet: Bullet): boolean {
-        // TODO: Also check if bullet hit a tank!
         if (bullet.x < 0 || bullet.y < 0 || bullet.x >= MapDescriptor.width, bullet.y >= MapDescriptor.height) {
             return true;
+        }
+        for (let entries of this.gameStatus.tanks.entries()) {
+            const tank = entries[1];
+            if (this.checkBoxHit(
+                bullet.x - BulletDescriptor.hitRadius, bullet.y - BulletDescriptor.hitRadius, BulletDescriptor.side,
+                tank.x, tank.y, TankDescriptor.side)) {
+                this.damageTank(entries[0], tank);
+                return true;
+            }
         }
         return false;
     }
@@ -195,19 +203,29 @@ export class GameService {
 
     private checkTankHitAgainstAllTanks(tankX: number, tankY: number): boolean {
         for (let tank of this.gameStatus.tanks.values()) {
-            if (this.checkTankHit(tankX, tankY, tank.x, tank.y)) {
+            if (this.checkBoxHit(tankX, tankY, TankDescriptor.side, tank.x, tank.y, TankDescriptor.side)) {
                 return true;
             }
         }
         return false;
     }
 
-    private checkTankHit(tank1X: number, tank1Y: number, tank2X: number, tank2Y: number): boolean {
-        return this.checkIntervalOverlap(tank1X, TankDescriptor.width, tank2X, TankDescriptor.width) &&
-            this.checkIntervalOverlap(tank1Y, TankDescriptor.height, tank2Y, TankDescriptor.height);
+    private checkBoxHit(x1: number, y1: number, side1: number, x2: number, y2: number, side2: number): boolean {
+        return this.checkIntervalOverlap(x1, side1, x2, side2) &&
+            this.checkIntervalOverlap(y1, side1, y2, side2);
     }
 
     private checkIntervalOverlap(start1: number, length1: number, start2: number, length2: number): boolean {
-        return start2 >= start1 && start2 < start1 + length1 || start2 + length2 > start1 && start2 < start1 + length2;
+        return start1 < start2 + length2 && start1 + length1 > start2;
+        //return start2 >= start1 && start2 < start1 + length1
+        //    || start2 + length2 > start1 && start2 < start1 + length2;
+    }
+
+    private damageTank(token: string, tank: TankStatus) {
+        tank.hp -= BULLET_DAMAGE;
+        if (tank.hp <= 0) {
+            this.deleteTank(token);
+        }
+        // TODO: Send defeated message
     }
 }

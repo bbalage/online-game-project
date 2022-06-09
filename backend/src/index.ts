@@ -35,7 +35,7 @@ const gameService = new GameService(webSocketService, activeUserService);
 const game = new Game(gameService);
 const fps = 1000 / 30; // milliseconds / rate
 setInterval(() => game.loop(), fps);
-server.listen(port, () => {
+server.listen(port, '0.0.0.0', () => {
   console.log("Listening on " + port);
   app.use("/users", getUsersRouter(activeUserService));
   app.use("/histories", getHistoryRouter());

@@ -1,8 +1,14 @@
 export const BULLET_SPEED = 1;
+export const BULLET_DAMAGE = 5;
 
 export const TankDescriptor = {
-    width: 15,
-    height: 15
+    side: 15
+}
+
+export const BulletDescriptor = {
+    radius: 2,
+    side: 3,
+    hitRadius: 1
 }
 
 export const MapDescriptor = {

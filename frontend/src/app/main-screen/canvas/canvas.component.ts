@@ -24,9 +24,9 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     private ngZone: NgZone,
     private gameService: GameService,
     private snackBar: MatSnackBar) {
-      webSocketService.gameMessages$.subscribe({
-        next: (message: WSMessageGameReceived) => this.receiveGameUpdate(message)
-      });
+    webSocketService.gameMessages$.subscribe({
+      next: (message: WSMessageGameReceived) => this.receiveGameUpdate(message)
+    });
   }
 
   ngOnInit(): void {
@@ -68,6 +68,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
   private drawTank(tank: TankStatus) {
     this.ctx.drawImage(this.tankDirectionMap.get(tank.dir), tank.x, tank.y, 15, 15);
+    this.ctx.fillText(tank.hp.toString(), tank.x, tank.y, 15);
   }
 
   private drawBullet(bullet: BulletStatus) {
