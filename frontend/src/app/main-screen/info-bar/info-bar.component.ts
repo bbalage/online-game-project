@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { WebSocketService } from 'src/app/services/websocket.service';
 
 @Component({
@@ -8,18 +9,19 @@ import { WebSocketService } from 'src/app/services/websocket.service';
 })
 export class InfoBarComponent implements OnInit {
 
-  constructor(private webSocketService: WebSocketService) { }
+  @Output()
+  startGame: EventEmitter<undefined> = new EventEmitter();
+
+  constructor(private webSocketService: WebSocketService, private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
   }
 
   startPlaying() {
     if (!this.webSocketService.isOpen()) {
-      
-    } // TODO: Continue!
-    this.webSocketService.opened$.subscribe({
-      next: (v: undefined) => this.gameService.registerTank()
-    })
+      this.snackBar.open("Connection is not established!", "Dismiss");
+    }
+    this.startGame.emit();
   }
 
 }

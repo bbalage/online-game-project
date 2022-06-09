@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { WSMessageLogoutReceived } from '../models/WSMessages';
+import { GameService } from '../services/game.service';
 import { UserService } from '../services/user.service';
 import { WebSocketService } from '../services/websocket.service';
 
@@ -14,11 +15,16 @@ export class MainScreenComponent implements OnInit {
   constructor(
     private wsService: WebSocketService,
     private userService: UserService,
+    private gameService: GameService,
     private router: Router
-    ) {
+  ) {
     wsService.logoutMessages$.subscribe({
       next: (message: WSMessageLogoutReceived) => this.performLogout()
     });
+  }
+
+  ngOnInit(): void {
+
   }
 
   performLogout() {
@@ -27,8 +33,7 @@ export class MainScreenComponent implements OnInit {
     this.router.navigateByUrl("/login");
   }
 
-  ngOnInit(): void {
-
+  startGame() {
+    this.gameService.registerTank();
   }
-
 }

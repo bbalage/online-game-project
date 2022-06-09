@@ -4,6 +4,7 @@ import { WSMessageGameReceived, WSMessageMoveTank, WSSendMessageType } from '../
 import { ID_TOKEN_KEY } from './user.service';
 import { WebSocketService } from './websocket.service';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -11,6 +12,8 @@ export class GameService {
 
   private animationStatus: AnimationStatus | null = null;
   private defeated: boolean = false;
+  private lastShot: Date = new Date();
+  private readonly cannonCooldownMilliseconds = 1000;
 
   constructor(private webSocketService: WebSocketService) { }
 
@@ -56,6 +59,10 @@ export class GameService {
   }
 
   shootCannon() {
+    const now = new Date();
+    if (now.valueOf() - this.lastShot.valueOf() < this.cannonCooldownMilliseconds) {
+      return;
+    }
     this.webSocketService.sendMessage({
       header: {
         jwtToken: sessionStorage.getItem(ID_TOKEN_KEY),
@@ -63,6 +70,7 @@ export class GameService {
         type: WSSendMessageType.ShootCannon
       }
     });
+    this.lastShot = new Date();
   }
 
   isDefeated() {
