@@ -21,7 +21,7 @@ export class WebSocketService {
     public readonly tankRegisterMessages$ = new Subject<WSMessageRegisterTankReceived>();
     public readonly moveTankMessages$ = new Subject<WSMessageMoveTankReceived>();
     public readonly shootCannonMessages$ = new Subject<WSMessageShootCannonReceived>();
-    public readonly deleteTankCommands$ = new Subject<DeleteTankCommand>();
+    public readonly userSessionExpired$ = new Subject<string>();
 
     constructor(server: http.Server, private activeUserService: ActiveUserService) {
         this.initWebSocket(server);
@@ -38,7 +38,7 @@ export class WebSocketService {
                     return;
                 }
                 if (!this.activeUserService.isUserActive(msg.header.jwtToken)) {
-                    this.deleteTankCommands$.next({token: msg.header.jwtToken});
+                    this.userSessionExpired$.next(msg.header.jwtToken);
                     this.send({
                         header: {
                             type: WSSendMessageType.Logout,

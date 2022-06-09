@@ -1,6 +1,7 @@
 import { last } from 'rxjs';
 import { AnimationStatus, Bullet, BulletStatus, BULLET_SPEED, DeleteTankCommand, GameStatus, MapDescriptor, TankDescriptor, TankDirection, TankStatus } from '../model/GameStatus';
 import { WSMessageMoveTankReceived, WSMessageRegisterTankReceived, WSMessageShootCannonReceived, WSSendMessageType } from '../model/WSMessages';
+import { ActiveUserService, TokenSwitch } from '../websocket/activeUser-service';
 import { WebSocketService } from '../websocket/websocket-service';
 
 const EXIT_LIMIT = 10;
@@ -37,7 +38,7 @@ export class GameService {
         bullets: []
     };
 
-    constructor(private webSocketService: WebSocketService) {
+    constructor(private webSocketService: WebSocketService, private activeUserService: ActiveUserService) {
         console.log("Constructed game-service.");
         webSocketService.moveTankMessages$.subscribe({
             next: (message: WSMessageMoveTankReceived) => this.handleMoveTankMessage(message)
@@ -48,8 +49,11 @@ export class GameService {
         webSocketService.shootCannonMessages$.subscribe({
             next: (message: WSMessageShootCannonReceived) => this.handleShootCannon(message)
         });
-        webSocketService.deleteTankCommands$.subscribe({
-            next: (message: DeleteTankCommand) => this.deleteTank(message.token)
+        this.webSocketService.userSessionExpired$.subscribe({
+            next: (token: string) => this.deleteTank(token)
+        });
+        this.activeUserService.userRelogged$.subscribe({
+            next: (token: TokenSwitch) => this.relocateTokenOfTank(token)
         });
     }
 
@@ -93,8 +97,10 @@ export class GameService {
     }
 
     private handleTankRegistration(message: WSMessageRegisterTankReceived) {
+        if (this.gameStatus.tanks.has(message.header.jwtToken)) {
+            return;
+        }
         console.log("Creating new tank.");
-        // TODO: What happens if token already exists?
         this.gameStatus.tanks.set(message.header.jwtToken, this.generateNewTank());
     }
 
@@ -130,8 +136,17 @@ export class GameService {
         ));
     }
 
-    private deleteTank(token:string) {
+    private deleteTank(token: string) {
         this.gameStatus.tanks.delete(token);
+    }
+
+    private relocateTokenOfTank(tokenSwitch: TokenSwitch) {
+        const tank = this.gameStatus.tanks.get(tokenSwitch.oldToken);
+        if (tank === undefined) {
+            return;
+        }
+        this.gameStatus.tanks.set(tokenSwitch.newToken, tank);
+        this.gameStatus.tanks.delete(tokenSwitch.oldToken);
     }
 
     private generateNewTank(): TankStatus {

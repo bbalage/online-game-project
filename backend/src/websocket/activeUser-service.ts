@@ -1,9 +1,16 @@
+import { Subject } from "rxjs";
 import { ActiveUser, User } from "../model/User";
+
+export interface TokenSwitch {
+    oldToken: string,
+    newToken: string
+}
 
 ///This class could be used as login user memory, username can be determined by jwt token
 // the username can be broadcasted to all clients
 export class ActiveUserService {
     private static activeUserTokens: Map<string, ActiveUser> = new Map<string, ActiveUser>();
+    public readonly userRelogged$ = new Subject<TokenSwitch>();
 
     public addUser(token: string, expiresIn: number, user: User) {
         this.clearUserIfAlreadyExists(token, user);
@@ -14,9 +21,9 @@ export class ActiveUserService {
         ActiveUserService.activeUserTokens.set(token, activeUser);
     }
 
-    public getUserName(token: string) : string | null {
+    public getUserName(token: string): string | null {
         if (!this.isUserActive(token)) {
-            return null; 
+            return null;
         }
         const activeUser: ActiveUser | undefined = ActiveUserService.activeUserTokens.get(token);
         if (activeUser === undefined) {
@@ -29,7 +36,7 @@ export class ActiveUserService {
         ActiveUserService.activeUserTokens.delete(token);
     }
 
-    public isUserActive(token: string) : boolean {
+    public isUserActive(token: string): boolean {
         const activeUser: ActiveUser | undefined = ActiveUserService.activeUserTokens.get(token);
         if (activeUser === undefined) {
             return false;
@@ -41,7 +48,7 @@ export class ActiveUserService {
         return true;
     }
 
-    public isUserConnectionExpired(activeUser: ActiveUser) : boolean {
+    public isUserConnectionExpired(activeUser: ActiveUser): boolean {
         return activeUser.expiresAt > Math.floor(Date.now() / 1000);
     }
 
@@ -50,7 +57,9 @@ export class ActiveUserService {
             let key = entry[0];
             let value = entry[1];
             if (value.user.username === user.username) {
+                console.log("Sending Relog");
                 this.removeUser(key);
+                this.userRelogged$.next({ oldToken: key, newToken: token });
             }
         }
     }
