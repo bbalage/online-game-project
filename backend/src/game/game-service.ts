@@ -1,6 +1,6 @@
 import { last } from 'rxjs';
 import { AnimationStatus, Bullet, BulletDescriptor, BulletStatus, BULLET_DAMAGE, BULLET_SPEED, DeleteTankCommand, GameStatus, MapDescriptor, TankDescriptor, TankDirection, TankStatus } from '../model/GameStatus';
-import { WSMessageMoveTankReceived, WSMessageRegisterTankReceived, WSMessageShootCannonReceived, WSSendMessageType } from '../model/WSMessages';
+import { WSMessageMoveTankReceived, WSMessageShootCannonReceived, WSSendMessageType } from '../model/WSMessages';
 import { ActiveUserService, TokenSwitch } from '../websocket/activeUser-service';
 import { WebSocketService } from '../websocket/websocket-service';
 
@@ -34,7 +34,7 @@ export class GameService {
     ]);
 
     private gameStatus: GameStatus = {
-        tanks: new Map<string, TankStatus>(),
+        tanks: new Map<number, TankStatus>(),
         bullets: []
     };
 
@@ -44,16 +44,10 @@ export class GameService {
             next: (message: WSMessageMoveTankReceived) => this.handleMoveTankMessage(message)
         });
         webSocketService.tankRegisterMessages$.subscribe({
-            next: (message: WSMessageRegisterTankReceived) => this.handleTankRegistration(message)
+            next: (id: number) => this.handleTankRegistration(id)
         });
         webSocketService.shootCannonMessages$.subscribe({
             next: (message: WSMessageShootCannonReceived) => this.handleShootCannon(message)
-        });
-        this.webSocketService.userSessionExpired$.subscribe({
-            next: (token: string) => this.deleteTank(token)
-        });
-        this.activeUserService.userRelogged$.subscribe({
-            next: (token: TokenSwitch) => this.relocateTokenOfTank(token)
         });
     }
 
@@ -96,16 +90,16 @@ export class GameService {
         this.removeDisabledBullets(disabledCount);
     }
 
-    private handleTankRegistration(message: WSMessageRegisterTankReceived) {
-        if (this.gameStatus.tanks.has(message.header.jwtToken)) {
+    private handleTankRegistration(id: number) {
+        if (this.gameStatus.tanks.has(id)) {
             return;
         }
         console.log("Creating new tank.");
-        this.gameStatus.tanks.set(message.header.jwtToken, this.generateNewTank());
+        this.gameStatus.tanks.set(id, this.generateNewTank());
     }
 
     private handleMoveTankMessage(message: WSMessageMoveTankReceived) {
-        const senderTank = this.gameStatus.tanks.get(message.header.jwtToken);
+        const senderTank = this.gameStatus.tanks.get(message.header.id);
         if (senderTank === undefined) {
             return; // TODO: This is an error. Handle somehow!
         }
@@ -116,7 +110,7 @@ export class GameService {
 
     private handleShootCannon(message: WSMessageShootCannonReceived) {
         console.log("Game Service handles cannon shoot.");
-        const currentTank = this.gameStatus.tanks.get(message.header.jwtToken);
+        const currentTank = this.gameStatus.tanks.get(message.header.id);
         if (currentTank === undefined) {
             // TODO: This is an error. Handle somehow!
             return;
@@ -136,17 +130,8 @@ export class GameService {
         ));
     }
 
-    private deleteTank(token: string) {
-        this.gameStatus.tanks.delete(token);
-    }
-
-    private relocateTokenOfTank(tokenSwitch: TokenSwitch) {
-        const tank = this.gameStatus.tanks.get(tokenSwitch.oldToken);
-        if (tank === undefined) {
-            return;
-        }
-        this.gameStatus.tanks.set(tokenSwitch.newToken, tank);
-        this.gameStatus.tanks.delete(tokenSwitch.oldToken);
+    private deleteTank(id: number) {
+        this.gameStatus.tanks.delete(id);
     }
 
     private generateNewTank(): TankStatus {
@@ -217,14 +202,12 @@ export class GameService {
 
     private checkIntervalOverlap(start1: number, length1: number, start2: number, length2: number): boolean {
         return start1 < start2 + length2 && start1 + length1 > start2;
-        //return start2 >= start1 && start2 < start1 + length1
-        //    || start2 + length2 > start1 && start2 < start1 + length2;
     }
 
-    private damageTank(token: string, tank: TankStatus) {
+    private damageTank(id: number, tank: TankStatus) {
         tank.hp -= BULLET_DAMAGE;
         if (tank.hp <= 0) {
-            this.deleteTank(token);
+            this.deleteTank(id);
         }
         // TODO: Send defeated message
     }

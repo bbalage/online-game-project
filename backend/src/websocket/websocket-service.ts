@@ -7,21 +7,19 @@ import {
     WSMessageMoveTankReceived,
     WSMessageReceived,
     WSMessageSend,
-    WSMessageRegisterTankReceived,
     WSMessageShootCannonReceived,
     WSSendMessageType
 } from '../model/WSMessages';
 import { ActiveUserService } from './activeUser-service';
-import { DeleteTankCommand } from '../model/GameStatus';
 
 export class WebSocketService {
 
     ws!: WebSocket.Server;
     public readonly chatMessages$ = new Subject<WSMessageChatReceived>();
-    public readonly tankRegisterMessages$ = new Subject<WSMessageRegisterTankReceived>();
+    public readonly tankRegisterMessages$ = new Subject<number>();
     public readonly moveTankMessages$ = new Subject<WSMessageMoveTankReceived>();
     public readonly shootCannonMessages$ = new Subject<WSMessageShootCannonReceived>();
-    public readonly userSessionExpired$ = new Subject<string>();
+    public readonly userSessionExpired$ = new Subject<number>();
 
     constructor(server: http.Server, private activeUserService: ActiveUserService) {
         this.initWebSocket(server);
@@ -38,23 +36,27 @@ export class WebSocketService {
                     return;
                 }
                 if (!this.activeUserService.isUserActive(msg.header.jwtToken)) {
-                    this.userSessionExpired$.next(msg.header.jwtToken);
-                    this.send({
+                    const reply: WSMessageSend = {
                         header: {
                             type: WSSendMessageType.Logout,
                             timestamp: new Date()
                         }
-                    })
+                    };
+                    ws.send(JSON.stringify(reply));
                 }
+                const id = this.activeUserService.getId(msg.header.jwtToken);
+                if (id === null || id === undefined) {
+                    return;
+                }
+                const idHeader = { id: id, timestamp: msg.header.timestamp }
                 switch (msg.header.type) {
                     case WSRecievedMessageType.RegisterTank:
-                        console.log("Handling tank registering message " + msg.header.timestamp);
-                        this.tankRegisterMessages$.next(msg);
+                        this.tankRegisterMessages$.next(id);
                         break;
                     case WSRecievedMessageType.MoveTank:
                         if (msg.data) {
                             this.moveTankMessages$.next({
-                                header: msg.header,
+                                header: idHeader,
                                 data: {
                                     x: msg.data.x,
                                     y: msg.data.y,
@@ -65,7 +67,7 @@ export class WebSocketService {
                         break;
                     case WSRecievedMessageType.ShootCannon:
                         this.shootCannonMessages$.next({
-                            header: msg.header,
+                            header: idHeader
                         });
                         break;
                     case WSRecievedMessageType.ChatMessage:

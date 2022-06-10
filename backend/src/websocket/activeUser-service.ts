@@ -10,7 +10,6 @@ export interface TokenSwitch {
 // the username can be broadcasted to all clients
 export class ActiveUserService {
     private static activeUserTokens: Map<string, ActiveUser> = new Map<string, ActiveUser>();
-    public readonly userRelogged$ = new Subject<TokenSwitch>();
 
     public addUser(token: string, expiresIn: number, user: User) {
         this.clearUserIfAlreadyExists(token, user);
@@ -30,6 +29,17 @@ export class ActiveUserService {
             return null;
         }
         return activeUser.user.username;
+    }
+
+    public getId(token: string): number | null {
+        if (!this.isUserActive(token)) {
+            return null;
+        }
+        const activeUser: ActiveUser | undefined = ActiveUserService.activeUserTokens.get(token);
+        if (activeUser === undefined) {
+            return null;
+        }
+        return activeUser.user.id;
     }
 
     public removeUser(token: string) {
@@ -57,9 +67,7 @@ export class ActiveUserService {
             let key = entry[0];
             let value = entry[1];
             if (value.user.username === user.username) {
-                console.log("Sending Relog");
                 this.removeUser(key);
-                this.userRelogged$.next({ oldToken: key, newToken: token });
             }
         }
     }

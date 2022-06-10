@@ -1,5 +1,5 @@
 export const BULLET_SPEED = 1;
-export const BULLET_DAMAGE = 5;
+export const BULLET_DAMAGE = 50;
 
 export const TankDescriptor = {
     side: 15
@@ -62,7 +62,7 @@ export interface AnimationStatus {
 }
 
 export interface GameStatus {
-    tanks: Map<string, TankStatus>,
+    tanks: Map<number, TankStatus>,
     bullets: Bullet[]
 }
 

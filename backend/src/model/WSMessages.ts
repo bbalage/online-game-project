@@ -50,16 +50,9 @@ export interface WSMessageChatSend {
     }
 }
 
-export interface WSMessageRegisterTankReceived {
-    header: {
-        jwtToken: string,
-        timestamp: Date
-    }
-}
-
 export interface WSMessageMoveTankReceived {
     header: {
-        jwtToken: string,
+        id: number,
         timestamp: Date
     },
     data: {
@@ -71,7 +64,7 @@ export interface WSMessageMoveTankReceived {
 
 export interface WSMessageShootCannonReceived {
     header: {
-        jwtToken: string,
+        id: number,
         timestamp: Date
     }
 }
