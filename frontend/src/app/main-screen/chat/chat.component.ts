@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { WebSocketService } from 'src/app/services/websocket.service';
 import { FormControl, FormGroup } from '@angular/forms';
 import { WSMessageChatReceived, WSSendMessageType } from 'src/app/models/WSMessages';
@@ -22,6 +22,8 @@ export class ChatComponent implements OnInit {
     message: new FormControl('')
   });
 
+  @Output()
+  switchedToChat: EventEmitter<undefined> = new EventEmitter();
 
   constructor(private webSocketService: WebSocketService) {
     webSocketService.chatMessages$.subscribe({
@@ -70,5 +72,9 @@ export class ChatComponent implements OnInit {
       });
       this.messageForm.setValue({ message: '' });
     }
+  }
+
+  switchToChat() {
+    this.switchedToChat.emit();
   }
 }

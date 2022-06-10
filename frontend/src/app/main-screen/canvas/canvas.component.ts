@@ -1,5 +1,6 @@
-import { AfterViewInit, Component, ElementRef, NgZone, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Subject } from 'rxjs';
 import { TankStatus, TankDirection, BulletStatus } from 'src/app/models/AnimationStatus';
 import { WSMessageGameReceived } from 'src/app/models/WSMessages';
 import { GameService } from 'src/app/services/game.service';
@@ -13,10 +14,12 @@ import { WebSocketService } from 'src/app/services/websocket.service';
 
 export class CanvasComponent implements OnInit, AfterViewInit {
 
+  @Input()
+  disablingGameMode!: Subject<undefined>;
+
   @ViewChild('canvas', { static: true }) private canvas!: ElementRef<HTMLCanvasElement>;
   private ctx !: CanvasRenderingContext2D;
   private tankDirectionMap!: Map<TankDirection, any>;
-  // TODO: Purpose is to make chat and game events coexist. Implement!
   private playMode: boolean = true;
 
   constructor(
@@ -30,6 +33,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.disablingGameMode.subscribe(() => this.deactivateGameMode())
   }
 
   ngAfterViewInit(): void {
@@ -92,6 +96,8 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
     document.addEventListener("keydown", (e) => this.keyDownHandler(e), false);
     document.addEventListener("keyup", (e) => this.keyUpHandler(e), false);
+    this.canvas.nativeElement.addEventListener("click", (e) => this.activateGame(), false);
+
     // this.canvas.nativeElement.addEventListener("mousemove", (e) => this.mouseMoveHandler(e), false);
   }
 
@@ -115,6 +121,14 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     if (this.playMode) {
       console.log(e);
     }
+  }
+
+  private activateGame() {
+    this.playMode = true;
+  }
+
+  private deactivateGameMode() {
+    this.playMode = false;
   }
 
   private mouseMoveHandler(e: Event) {

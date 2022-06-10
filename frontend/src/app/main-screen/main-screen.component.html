@@ -3,9 +3,9 @@
         <app-info-bar (startGame)="startGame()"></app-info-bar>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="4" [rowspan]="15" [style.background]="'red'">
-        <app-canvas></app-canvas>
+        <app-canvas [disablingGameMode]="disablingGameMode"></app-canvas>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="1" [rowspan]="15" [style.background]="'grey'">
-        <app-chat style="height: 100%"></app-chat>
+        <app-chat style="height: 100%" (switchedToChat)="disableGameMode()"></app-chat>
     </mat-grid-tile>
 </mat-grid-list>

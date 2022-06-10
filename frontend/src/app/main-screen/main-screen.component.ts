@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
 import { WSMessageLogoutReceived } from '../models/WSMessages';
 import { GameService } from '../services/game.service';
 import { UserService } from '../services/user.service';
@@ -11,6 +12,8 @@ import { WebSocketService } from '../services/websocket.service';
   styleUrls: ['./main-screen.component.css']
 })
 export class MainScreenComponent implements OnInit {
+
+  disablingGameMode: Subject<undefined> = new EventEmitter();
 
   constructor(
     private wsService: WebSocketService,
@@ -35,5 +38,9 @@ export class MainScreenComponent implements OnInit {
 
   startGame() {
     this.gameService.registerTank();
+  }
+
+  disableGameMode() {
+    this.disablingGameMode.next(undefined);
   }
 }
