@@ -1,6 +1,6 @@
-import { MessageType, WSMessageChatReceived } from '../model/WSMessages';
-import { ActiveUserService } from './activeUser-service';
-import { WebSocketService } from './websocket-service';
+import { WSRecievedMessageType, WSMessageChatReceived, WSSendMessageType } from '../model/WSMessages';
+import { ActiveUserService } from '../websocket/activeUser-service';
+import { WebSocketService } from '../websocket/websocket-service';
 
 export class ChatService {
 
@@ -17,7 +17,7 @@ export class ChatService {
         console.log("chat-service handling message.");
         const sentMessage = {
             header: {
-                type: MessageType.ChatMessage,
+                type: WSSendMessageType.ChatMessage,
                 timestamp: new Date()
             },
             data: {

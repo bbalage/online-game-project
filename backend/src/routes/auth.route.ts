@@ -21,6 +21,7 @@ export function getRouter(activeUserService: ActiveUserService): Router {
           expiresIn: bearerExpirationTimeSeconds,
           subject: rowId.toString(),
         });
+        user.id = rowId;
         activeUserService.addUser(jwtBearerToken, bearerExpirationTimeSeconds, user);
         res.status(200).json({
           idToken: jwtBearerToken,

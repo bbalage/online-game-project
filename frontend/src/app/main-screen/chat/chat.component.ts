@@ -1,7 +1,7 @@
-import { Component, Directive, OnChanges, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { WebSocketService } from 'src/app/services/websocket.service';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { WSMessageChatReceived, WSMessageType } from 'src/app/models/WSMessages';
+import { FormControl, FormGroup } from '@angular/forms';
+import { WSMessageChatReceived, WSSendMessageType } from 'src/app/models/WSMessages';
 import { ID_TOKEN_KEY } from 'src/app/services/user.service';
 
 interface ChatBubble {
@@ -22,6 +22,8 @@ export class ChatComponent implements OnInit {
     message: new FormControl('')
   });
 
+  @Output()
+  switchedToChat: EventEmitter<undefined> = new EventEmitter();
 
   constructor(private webSocketService: WebSocketService) {
     webSocketService.chatMessages$.subscribe({
@@ -47,7 +49,6 @@ export class ChatComponent implements OnInit {
     const scroll = document.getElementById("scroll");
     if (scroll != null)
       scroll.scrollTop = scroll.scrollHeight;
-    console.log(scroll?.scrollTop);
   }
 
   onKeyPress(event: KeyboardEvent) {
@@ -62,7 +63,7 @@ export class ChatComponent implements OnInit {
       this.webSocketService.sendMessage({
         header: {
           jwtToken: sessionStorage.getItem(ID_TOKEN_KEY),
-          type: WSMessageType.ChatMessage,
+          type: WSSendMessageType.ChatMessage,
           timestamp: new Date()
         },
         data: {
@@ -71,5 +72,9 @@ export class ChatComponent implements OnInit {
       });
       this.messageForm.setValue({ message: '' });
     }
+  }
+
+  switchToChat() {
+    this.switchedToChat.emit();
   }
 }

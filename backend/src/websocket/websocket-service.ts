@@ -1,16 +1,27 @@
 import * as WebSocket from 'ws';
 import * as http from 'http';
 import { Subject } from 'rxjs';
-import { MessageType, WSMessageChatReceived, WSMessageGameReceived, WSMessageReceived, WSMessageSend } from '../model/WSMessages';
+import {
+    WSRecievedMessageType,
+    WSMessageChatReceived,
+    WSMessageMoveTankReceived,
+    WSMessageReceived,
+    WSMessageSend,
+    WSMessageShootCannonReceived,
+    WSSendMessageType
+} from '../model/WSMessages';
+import { ActiveUserService } from './activeUser-service';
 
 export class WebSocketService {
 
     ws!: WebSocket.Server;
     public readonly chatMessages$ = new Subject<WSMessageChatReceived>();
-    public readonly gameMessages$ = new Subject<WSMessageGameReceived>();
-    public readonly tankRegisterMessages$ = new Subject<WSMessageReceived>();
+    public readonly tankRegisterMessages$ = new Subject<number>();
+    public readonly moveTankMessages$ = new Subject<WSMessageMoveTankReceived>();
+    public readonly shootCannonMessages$ = new Subject<WSMessageShootCannonReceived>();
+    public readonly userSessionExpired$ = new Subject<number>();
 
-    constructor(server: http.Server) {
+    constructor(server: http.Server, private activeUserService: ActiveUserService) {
         this.initWebSocket(server);
     }
 
@@ -21,33 +32,50 @@ export class WebSocketService {
 
             ws.onmessage = (message: WebSocket.MessageEvent) => {
                 const msg = JSON.parse(message.data.toString()) as WSMessageReceived;
-                // TODO: Check jwt token! If token is invalid, send message to exit user!
+                if (msg.header.jwtToken === undefined) {
+                    return;
+                }
+                if (!this.activeUserService.isUserActive(msg.header.jwtToken)) {
+                    const reply: WSMessageSend = {
+                        header: {
+                            type: WSSendMessageType.Logout,
+                            timestamp: new Date()
+                        }
+                    };
+                    ws.send(JSON.stringify(reply));
+                }
+                const id = this.activeUserService.getId(msg.header.jwtToken);
+                if (id === null || id === undefined) {
+                    return;
+                }
+                const idHeader = { id: id, timestamp: msg.header.timestamp }
                 switch (msg.header.type) {
-                    case MessageType.RegisterTank:
-                        console.log("Handling tank registering message " + msg.header.timestamp);
-                        this.tankRegisterMessages$.next(msg);
+                    case WSRecievedMessageType.RegisterTank:
+                        this.tankRegisterMessages$.next(id);
                         break;
-                    case MessageType.ChatMessage:
-                        console.log("Handling chat message " + msg.header.timestamp);
+                    case WSRecievedMessageType.MoveTank:
+                        if (msg.data) {
+                            this.moveTankMessages$.next({
+                                header: idHeader,
+                                data: {
+                                    x: msg.data.x,
+                                    y: msg.data.y,
+                                    dir: msg.data.dir,
+                                }
+                            });
+                        }
+                        break;
+                    case WSRecievedMessageType.ShootCannon:
+                        this.shootCannonMessages$.next({
+                            header: idHeader
+                        });
+                        break;
+                    case WSRecievedMessageType.ChatMessage:
                         if (msg.data && msg.data.text) {
                             this.chatMessages$.next({
                                 header: msg.header,
                                 data: {
                                     text: msg.data.text
-                                }
-                            });
-                        }
-                        break;
-                    case MessageType.GameStatus:
-                        console.log("Handling new game status " + msg.header.timestamp);
-                        if (msg.data) {
-                            this.gameMessages$.next({
-                                header: msg.header,
-                                data: {
-                                    x: msg.data.x,
-                                    y: msg.data.y,
-                                    dir: msg.data.dir,
-                                    shot: msg.data.shot
                                 }
                             });
                         }
@@ -68,7 +96,6 @@ export class WebSocketService {
 
     // TODO: Use clients parameter to send only to specific clients. Possibly userId would be better for this?
     public send(message: WSMessageSend, clients?: WebSocket.WebSocket) {
-        console.log("Sending message of type: " + message.header.type);
         this.ws.clients.forEach((client) => {
             client.send(JSON.stringify(message));
         });

@@ -1,23 +1,22 @@
 <div style="height: 100%">
-            <div style="overflow-y: scroll; height: 80%; flex-direction: column-reverse" id="scroll">
-                <div *ngFor="let chatBubble of chatBubbles" style="overflow-wrap: anywhere !important; padding: 1em;">
-                    <div>{{chatBubble.username}} {{chatBubble.time | date}}</div>
-                    <mat-card [ngStyle]="{'background-color': (chatBubble.username==this.currentUsername) ? 'white':'#a6a6a6'}">
-                    
-                        <mat-card-content >
-                            
-                            {{ chatBubble.text }}
-                        </mat-card-content>
-                    </mat-card>     
-                </div>
-                {{this.scrollDown()}}
-            </div>
-                        <div style="height: 20%; text-align: center; ">
-                            <mat-form-field appearance="fill" [formGroup]="messageForm">
-                                <mat-label>Input</mat-label>
-                                <input matInput formControlName="message" (keypress)="onKeyPress($event)">
-                            </mat-form-field>
-                            <button (click)="sendChatMessage()" mat-button color="primary">Send message</button>
-                        </div>
-</div>
+    <div style="overflow-y: scroll; height: 80%; flex-direction: column-reverse" id="scroll">
+        <div *ngFor="let chatBubble of chatBubbles" style="overflow-wrap: anywhere !important; padding: 1em;">
+            <div>{{chatBubble.username}} {{chatBubble.time | date}}</div>
+            <mat-card [ngStyle]="{'background-color': (chatBubble.username==this.currentUsername) ? 'white':'#a6a6a6'}">
 
+                <mat-card-content>
+
+                    {{ chatBubble.text }}
+                </mat-card-content>
+            </mat-card>
+        </div>
+        {{this.scrollDown()}}
+    </div>
+    <div style="height: 20%; text-align: center; ">
+        <mat-form-field appearance="fill" [formGroup]="messageForm" (click)="switchToChat()">
+            <mat-label>Input</mat-label>
+            <input matInput formControlName="message" (keypress)="onKeyPress($event)">
+        </mat-form-field>
+        <button (click)="sendChatMessage()" mat-button color="primary">Send message</button>
+    </div>
+</div>
