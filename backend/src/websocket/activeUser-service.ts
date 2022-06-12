@@ -1,11 +1,6 @@
 import { Subject } from "rxjs";
 import { ActiveUser, User } from "../model/User";
 
-export interface TokenSwitch {
-    oldToken: string,
-    newToken: string
-}
-
 ///This class could be used as login user memory, username can be determined by jwt token
 // the username can be broadcasted to all clients
 export class ActiveUserService {

@@ -1,8 +1,7 @@
 import { last } from 'rxjs';
-import { userHistoryDao } from '../database/UserHistoryDAO';
-import { AnimationStatus, Bullet, BulletDescriptor, BulletStatus, BULLET_DAMAGE, BULLET_SPEED, DeleteTankCommand, GameStatus, MapDescriptor, TankDescriptor, TankDirection, TankStatus } from '../model/GameStatus';
+import { AnimationStatus, Bullet, BulletDescriptor, BulletStatus, BULLET_DAMAGE, BULLET_SPEED, GameStatus, MapDescriptor, TankDescriptor, TankDirection, TankStatus } from '../model/GameStatus';
 import { WSMessageMoveTankReceived, WSMessageShootCannonReceived, WSSendMessageType } from '../model/WSMessages';
-import { ActiveUserService, TokenSwitch } from '../websocket/activeUser-service';
+import { ActiveUserService } from '../websocket/activeUser-service';
 import { WebSocketService } from '../websocket/websocket-service';
 import { ScoreLoggerService } from './score-logger-service';
 
