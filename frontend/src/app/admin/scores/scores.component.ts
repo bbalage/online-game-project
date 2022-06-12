@@ -11,13 +11,13 @@ export class ScoresComponent implements OnInit {
 
   constructor(private historyService: HistoryService) { }
 
-  scores: History[] = [];
+  userHistories: History[] = [];
 
-  displayedColumns: string[] = ['id', 'username'];
+  displayedColumns: string[] = ['id', 'username', 'score', 'time'];
 
   ngOnInit(): void {
     this.historyService.getHistories().subscribe((histories) => {
-      this.scores = histories;
+      this.userHistories = histories;
     })
   }
 

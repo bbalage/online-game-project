@@ -11,6 +11,7 @@ import { ActiveUserService } from './websocket/activeUser-service';
 import { Game } from './game/game';
 import { AdminDao } from './database/AdminDao';
 import { ActiveAdminService } from './websocket/activeAdmin-service';
+import { ScoreLoggerService } from './game/score-logger-service';
 
 const app = express();
 
@@ -31,9 +32,10 @@ const port: number = 3000;
 
 const activeUserService: ActiveUserService = new ActiveUserService();
 const activeAdminService: ActiveAdminService = new ActiveAdminService();
+const scoreLoggerService: ScoreLoggerService = new ScoreLoggerService();
 const webSocketService = new WebSocketService(server, activeUserService);
 const chatService = new ChatService(webSocketService, activeUserService);
-const gameService = new GameService(webSocketService, activeUserService);
+const gameService = new GameService(webSocketService, activeUserService, scoreLoggerService);
 const game = new Game(gameService);
 const fps = 1000 / 30; // milliseconds / rate
 setInterval(() => game.loop(), fps);

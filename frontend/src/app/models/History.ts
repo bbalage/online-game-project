@@ -1,8 +1,8 @@
-import { User } from "./User";
+import { UserReceived } from "./User";
 
 export interface History {
     id: number | null,
-    user: User,
+    user: UserReceived,
     score: number,
     date: Date
 }

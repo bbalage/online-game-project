@@ -1,75 +1,58 @@
-# Notes
+# Online game
 
-## Required
-- Websocket
-- REST (mondjuk a meccs állásáról)
-- Chat
-- Server-db connection
-- Admin felület
+This repository contains a hand-in project for the university course Software development methodologies.
 
-**repo:**
-- backend
-- frontend
+## Launch the servers
 
-**Pluszok:**
-- voice
+Prequisite:
+- Angular CLI installation (our version: 13.2.6)
+- node (our version: v12.22.12)
+- npm (our version: 6.14.16)
 
-### Game ideas
-- shooting
-- tower defense
-
-## Menüpontok
-1. Login / regisztráció
-2. Game felület: (1) Chat (2) Státusz (3) Canvas
-
-### Feladatok
-- **login** - REST API + Registration + Password
-- **admin** - REST API
-- **chat** - WebSocket
-- **game** - WebSocket
-
-**Marci:**
-- login
-- registration
-- admin
-
-**Dávid:**
-- db help
-- voice chat
-
-**Balázs:**
-- Keret
-- WebSocket alap kommunikáció
+First clone the repository then open a terminal. From the directory of the cloned repository, issue the following commands:
 
 ```
-User = {
-    id: number
-    username: string
-    password: hash
-}
-
-UserHistory = {
-    id: number
-    idref: number
-    score: number
-    date: date
-}
+cd backend
+npm i
+npm run start
+# or use npm run start-dev
 ```
 
-Játék adatainak tárolása: Session storage-ba.
+Open another terminal, and issue the following commands from the directory of the repository:
 
 ```
-Message = {
-    header = {
-        type: integer
-        userId: integer
-        timestamp: datetime
-    }
-    data = {
-        ...
-    }
-}
+cd frontend
+npm i
+ng serve
 ```
 
-**Kérdőjeles dolgok:**
-- Tesztelés
+You can play the game through the *http://localhost:4200* url.
+
+You can use the admin interface through the *http://localhost:4200/admin* url.
+
+## Game description
+
+In order to play, first Register, then log in.
+
+The game is a simple tank game. Once you logged in, you may push the **Play!** button on the info bar. This should generate a new tank for you if you do not already have one.
+
+### Controls:
+- **Movement:** WASD keys.
+- **Shoot cannon:** Space key.
+
+### Metadata
+The game logs the score of the players. If you damage another tank with the cannon, then the damage you dealt will be logged. Currently the data is only available through the admin site.
+
+### Death
+The game displays your HP. If it reaches zero, you die. You can keep playing by pressing the **Play!** button again.
+
+## Chat
+
+You can switch between game and chat by click on the game map and the textbox respectively. Be careful not to get shot while chatting!
+
+## Admin
+
+On the admin site you can:
+- List and add users.
+- See high scores.
+- Send chat messages.

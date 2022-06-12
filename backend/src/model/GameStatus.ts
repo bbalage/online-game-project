@@ -1,5 +1,5 @@
 export const BULLET_SPEED = 1;
-export const BULLET_DAMAGE = 50;
+export const BULLET_DAMAGE = 10;
 
 export const TankDescriptor = {
     side: 15
@@ -12,8 +12,8 @@ export const BulletDescriptor = {
 }
 
 export const MapDescriptor = {
-    width: 200,
-    height: 100
+    width: 250,
+    height: 130
 }
 
 export enum TankDirection {
@@ -38,12 +38,14 @@ export class Bullet {
     vx!: number;
     vy!: number;
     disabled: boolean = false;
+    shooterId!: number;
 
-    constructor(x: number, y: number, vx: number, vy: number) {
+    constructor(x: number, y: number, vx: number, vy: number, shooterId: number) {
         this.x = x;
         this.y = y;
         this.vx = vx;
         this.vy = vy;
+        this.shooterId = shooterId;
     }
 
     move() {
@@ -64,8 +66,4 @@ export interface AnimationStatus {
 export interface GameStatus {
     tanks: Map<number, TankStatus>,
     bullets: Bullet[]
-}
-
-export interface DeleteTankCommand {
-    token: string
 }

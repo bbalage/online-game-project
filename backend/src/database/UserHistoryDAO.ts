@@ -1,5 +1,5 @@
 import { RunResult, Statement } from "sqlite3";
-import { UserHistory } from "../model/UserHistory";
+import { UserHistoryLocal, UserHistorySend } from "../model/UserHistory";
 import { getConnection } from "./Connection";
 
 
@@ -21,10 +21,10 @@ export class UserHistoryDAO {
     }
 
 
-    addUserHistory(userHistory: UserHistory): Promise<boolean> {
+    addUserHistory(userHistory: UserHistoryLocal): Promise<boolean> {
         return new Promise<boolean>(function (resolve, reject) {
             let prepared: Statement = getConnection().prepare("INSERT INTO user_history(userid,score,date) VALUES(?,?,?);");
-            prepared.run(userHistory.user.id, userHistory.score, userHistory.date, (runResult: RunResult, err: Error | null) => {
+            prepared.run(userHistory.userId, userHistory.score, userHistory.date, (runResult: RunResult, err: Error | null) => {
                 if (!err) {
                     resolve(true);
                 }
@@ -35,19 +35,16 @@ export class UserHistoryDAO {
         });
     }
 
-    getUserHistoryById(id: number): Promise<UserHistory> {
-        return new Promise<UserHistory>(function (resolve, reject) {
-            let prepared: Statement = getConnection().prepare("SELECT id, score, userid, date FROM user_history where id=?;");
+    getUserHistoryById(id: number): Promise<UserHistorySend> {
+        return new Promise<UserHistorySend>(function (resolve, reject) {
+            let prepared: Statement = getConnection().prepare(
+                "SELECT h.id as id, h.score as score, h.userid as userid, h.date as date, u.username as username FROM user_history h join user u on u.id = h.userid where h.id=?;");
             prepared.get(id, (err, row) => {
                 if (!err) {
-                    let userHistory: UserHistory = {
+                    let userHistory: UserHistorySend = {
                         id: row.id,
                         score: row.score,
-                        user: {
-                            id: row.userid,
-                            username: "",
-                            password: ""
-                        },
+                        user: { username: row.username },
                         date: new Date(row.date)
                     }
                     resolve(userHistory);
@@ -59,23 +56,22 @@ export class UserHistoryDAO {
         });
     }
 
-    getAllUserHistory(): Promise<UserHistory[]> {
-        let prepared: Statement = getConnection().prepare("SELECT id, score, userid, date FROM user_history;");
+    getAllUserHistory(): Promise<UserHistorySend[]> {
+        let prepared: Statement = getConnection().prepare(
+            "SELECT h.id as id, h.score as score, h.userid as userid, h.date as date, u.username as username FROM user_history h join user u on u.id = h.userid;");
 
-        return new Promise<UserHistory[]>(function (resolve, reject) {
+        return new Promise<UserHistorySend[]>(function (resolve, reject) {
             prepared.all((err, rows) => {
                 if (!err) {
                     console.log(rows);
-                    let historyList: UserHistory[] = []
+                    let historyList: UserHistorySend[] = []
 
                     for (const row of rows) {
-                        let userHistory: UserHistory = {
+                        let userHistory: UserHistorySend = {
                             id: row.id,
                             score: row.score,
                             user: {
-                                id: row.userid,
-                                username: "",
-                                password: ""
+                                username: row.username,
                             },
                             date: new Date(row.date)
                         }
@@ -93,3 +89,5 @@ export class UserHistoryDAO {
 
 
 }
+
+export const userHistoryDao = new UserHistoryDAO();
