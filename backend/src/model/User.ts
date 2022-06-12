@@ -4,6 +4,10 @@ export interface User {
     password: string
 }
 
+export interface UserSend {
+    username: string
+}
+
 export interface ActiveUser {
     user: User,
     expiresAt: number

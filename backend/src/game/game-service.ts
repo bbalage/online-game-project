@@ -1,8 +1,9 @@
 import { last } from 'rxjs';
-import { AnimationStatus, Bullet, BulletDescriptor, BulletStatus, BULLET_DAMAGE, BULLET_SPEED, DeleteTankCommand, GameStatus, MapDescriptor, TankDescriptor, TankDirection, TankStatus } from '../model/GameStatus';
+import { AnimationStatus, Bullet, BulletDescriptor, BulletStatus, BULLET_DAMAGE, BULLET_SPEED, GameStatus, MapDescriptor, TankDescriptor, TankDirection, TankStatus } from '../model/GameStatus';
 import { WSMessageMoveTankReceived, WSMessageShootCannonReceived, WSSendMessageType } from '../model/WSMessages';
-import { ActiveUserService, TokenSwitch } from '../websocket/activeUser-service';
+import { ActiveUserService } from '../websocket/activeUser-service';
 import { WebSocketService } from '../websocket/websocket-service';
+import { ScoreLoggerService } from './score-logger-service';
 
 const EXIT_LIMIT = 10;
 
@@ -27,10 +28,10 @@ export class GameService {
 
     // TODO: Change this once tank size is properly set!
     private tankDirectionShotOffsetMap: Map<TankDirection, ShotOffset> = new Map<TankDirection, ShotOffset>([
-        [TankDirection.UP, { dx: TankDescriptor.side / 2, dy: - 5 }],
+        [TankDirection.UP, { dx: TankDescriptor.side / 2, dy: - 1 }],
         [TankDirection.RIGHT, { dx: TankDescriptor.side + 1, dy: TankDescriptor.side / 2 }],
         [TankDirection.DOWN, { dx: TankDescriptor.side / 2, dy: TankDescriptor.side + 1 }],
-        [TankDirection.LEFT, { dx: -5, dy: TankDescriptor.side / 2 }]
+        [TankDirection.LEFT, { dx: -1, dy: TankDescriptor.side / 2 }]
     ]);
 
     private gameStatus: GameStatus = {
@@ -38,7 +39,9 @@ export class GameService {
         bullets: []
     };
 
-    constructor(private webSocketService: WebSocketService, private activeUserService: ActiveUserService) {
+    constructor(private webSocketService: WebSocketService,
+        private activeUserService: ActiveUserService,
+        private scoreLogger: ScoreLoggerService) {
         console.log("Constructed game-service.");
         webSocketService.moveTankMessages$.subscribe({
             next: (message: WSMessageMoveTankReceived) => this.handleMoveTankMessage(message)
@@ -103,30 +106,36 @@ export class GameService {
         if (senderTank === undefined) {
             return; // TODO: This is an error. Handle somehow!
         }
-        senderTank.x += message.data.x;
-        senderTank.y += message.data.y;
+        if (message.data.x !== 0
+            && senderTank.x + message.data.x + TankDescriptor.side < MapDescriptor.width
+            && senderTank.x + message.data.x >= 0) {
+            senderTank.x += message.data.x;
+        }
+        if (message.data.y !== 0
+            && senderTank.y + message.data.y + TankDescriptor.side < MapDescriptor.height
+            && senderTank.y + message.data.y >= 0) {
+            senderTank.y += message.data.y;
+        }
         senderTank.dir = message.data.dir;
     }
 
     private handleShootCannon(message: WSMessageShootCannonReceived) {
-        console.log("Game Service handles cannon shoot.");
         const currentTank = this.gameStatus.tanks.get(message.header.id);
         if (currentTank === undefined) {
             // TODO: This is an error. Handle somehow!
             return;
         }
-        console.log("Asking directions.");
         const shotDirection = this.tankDirectionShotMap.get(currentTank.dir);
         const shotOffset = this.tankDirectionShotOffsetMap.get(currentTank.dir);
         if (shotDirection === undefined || shotOffset === undefined) {
-            throw Error("Unexpected error!");
+            throw Error("Unexpected error! Shot direction or offset is undefined!");
         }
-        console.log("Adding bullet.");
         this.gameStatus.bullets.push(new Bullet(
             currentTank.x + shotOffset.dx,
             currentTank.y + shotOffset.dy,
             shotDirection.dx,
-            shotDirection.dy
+            shotDirection.dy,
+            message.header.id
         ));
     }
 
@@ -136,8 +145,8 @@ export class GameService {
 
     private generateNewTank(): TankStatus {
         for (let i = 0; i < EXIT_LIMIT; i++) {
-            let x = Math.random() * MapDescriptor.width;
-            let y = Math.random() * MapDescriptor.height;
+            let x = Math.random() * MapDescriptor.width - TankDescriptor.side - 1;
+            let y = Math.random() * MapDescriptor.height - TankDescriptor.side - 1;
             if (!this.checkTankHitAgainstAllTanks(x, y)) {
                 return {
                     x: x,
@@ -158,7 +167,7 @@ export class GameService {
     }
 
     private checkBulletHit(bullet: Bullet): boolean {
-        if (bullet.x < 0 || bullet.y < 0 || bullet.x >= MapDescriptor.width, bullet.y >= MapDescriptor.height) {
+        if (bullet.x < 0 || bullet.y < 0 || bullet.x >= MapDescriptor.width || bullet.y >= MapDescriptor.height) {
             return true;
         }
         for (let entries of this.gameStatus.tanks.entries()) {
@@ -167,6 +176,7 @@ export class GameService {
                 bullet.x - BulletDescriptor.hitRadius, bullet.y - BulletDescriptor.hitRadius, BulletDescriptor.side,
                 tank.x, tank.y, TankDescriptor.side)) {
                 this.damageTank(entries[0], tank);
+                this.scoreLogger.raiseScore(bullet.shooterId);
                 return true;
             }
         }

@@ -1,3 +1,8 @@
+export const MapDescriptor = {
+    width: 250,
+    height: 130
+}
+
 export enum TankDirection {
     UP = 1, RIGHT, DOWN, LEFT
 }
