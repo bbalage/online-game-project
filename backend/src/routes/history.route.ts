@@ -1,15 +1,15 @@
 import { Router } from "express";
-import { UserHistoryDAO } from "../database/UserHistoryDAO";
-import { UserHistory } from "../model/UserHistory";
+import { userHistoryDao, UserHistoryDAO } from "../database/UserHistoryDAO";
+import { UserHistoryLocal, UserHistorySend } from "../model/UserHistory";
 
 const router = Router();
-const historydao = new UserHistoryDAO();
+
 
 export function getHistoryRouter(): Router {
     router.get("/getOne", async function (req, res) {
         const historyId = req.query.id as unknown as number;
 
-        historydao
+        userHistoryDao
             .getUserHistoryById(historyId)
             .then(function (history) {
                 res.status(200).send(history);
@@ -20,8 +20,8 @@ export function getHistoryRouter(): Router {
     });
 
     router.post("/add", async function (req, res) {
-        const history: UserHistory = req.body.History;
-        historydao
+        const history: UserHistoryLocal = req.body.History;
+        userHistoryDao
             .addUserHistory(history)
             .then(function (result) {
                 res.status(200).send();
@@ -32,8 +32,8 @@ export function getHistoryRouter(): Router {
     });
 
     router.get("/get", async function (req, res) {
-        historydao.getAllUserHistory()
-            .then(function (histories: UserHistory[]) {
+        userHistoryDao.getAllUserHistory()
+            .then(function (histories: UserHistorySend[]) {
                 console.log(histories);
                 res.status(200).send(histories);
             })

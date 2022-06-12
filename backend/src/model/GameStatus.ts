@@ -38,12 +38,14 @@ export class Bullet {
     vx!: number;
     vy!: number;
     disabled: boolean = false;
+    shooterId!: number;
 
-    constructor(x: number, y: number, vx: number, vy: number) {
+    constructor(x: number, y: number, vx: number, vy: number, shooterId: number) {
         this.x = x;
         this.y = y;
         this.vx = vx;
         this.vy = vy;
+        this.shooterId = shooterId;
     }
 
     move() {

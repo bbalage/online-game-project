@@ -10,6 +10,7 @@ import { getHistoryRouter } from "./routes/history.route";
 import { GameService } from './game/game-service';
 import { ActiveUserService } from './websocket/activeUser-service';
 import { Game } from './game/game';
+import { ScoreLoggerService } from './game/score-logger-service';
 
 const app = express();
 
@@ -29,9 +30,10 @@ app.use(express.json());
 const port: number = 3000;
 
 const activeUserService: ActiveUserService = new ActiveUserService();
+const scoreLoggerService: ScoreLoggerService = new ScoreLoggerService();
 const webSocketService = new WebSocketService(server, activeUserService);
 const chatService = new ChatService(webSocketService, activeUserService);
-const gameService = new GameService(webSocketService, activeUserService);
+const gameService = new GameService(webSocketService, activeUserService, scoreLoggerService);
 const game = new Game(gameService);
 const fps = 1000 / 30; // milliseconds / rate
 setInterval(() => game.loop(), fps);
