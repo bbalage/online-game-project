@@ -30,6 +30,20 @@ export class UserService extends BaseService {
       );
   }
 
+  public authenticateAdmin(User: User) {
+    return this.http
+      .post(
+        environment.serverUrl + environment.admin + environment.validate,
+        { User }
+      )
+      .pipe(
+        map((res) => {
+          this.setSession(res);
+        }),
+        catchError((err) => this.handleError(err))
+      );
+  }
+
 
   public logoutUser() {
     sessionStorage.clear();
@@ -58,5 +72,11 @@ export class UserService extends BaseService {
     return this.http
       .get<User[]>(environment.serverUrl + environment.users + environment.get)
       .pipe<User[]>(catchError((err) => this.handleError(err)));
+  }
+
+  public checkAdmin() {
+    return this.http
+      .get(environment.serverUrl + environment.admin + environment.check)
+      .pipe(catchError((err) => this.handleError(err)));
   }
 }

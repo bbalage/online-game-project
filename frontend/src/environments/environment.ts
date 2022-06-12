@@ -6,6 +6,8 @@ export const environment = {
   production: false,
   serverUrl: 'http://localhost:3000',
   users:'/users',
+  admin:'/admin',
+  check:'/check',
   histories:'/histories',
   validate: "/validate",
   getOne: "/getOne",
