@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subject } from 'rxjs';
-import { TankStatus, TankDirection, BulletStatus } from 'src/app/models/AnimationStatus';
+import { TankStatus, TankDirection, BulletStatus, MapDescriptor } from 'src/app/models/AnimationStatus';
 import { WSMessageGameReceived } from 'src/app/models/WSMessages';
 import { GameService } from 'src/app/services/game.service';
 import { WebSocketService } from 'src/app/services/websocket.service';
@@ -57,7 +57,9 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
   animate() {
     const id = requestAnimationFrame(() => this.animate());
-    this.ctx.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
+    this.ctx.fillStyle = "#DC5539";
+    this.ctx.fillRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
+    this.ctx.clearRect(0, 0, MapDescriptor.width, MapDescriptor.height);
     const animationStatus = this.gameService.retrieveGameAnimationStatus();
     if (!animationStatus) {
       return;
@@ -72,6 +74,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
   private drawTank(tank: TankStatus) {
     this.ctx.drawImage(this.tankDirectionMap.get(tank.dir), tank.x, tank.y, 15, 15);
+    this.ctx.fillStyle = tank.hp < 50 ? "red" : "blue";
     this.ctx.fillText(tank.hp.toString(), tank.x, tank.y, 15);
   }
 

@@ -12,8 +12,8 @@ export const BulletDescriptor = {
 }
 
 export const MapDescriptor = {
-    width: 200,
-    height: 100
+    width: 250,
+    height: 130
 }
 
 export enum TankDirection {

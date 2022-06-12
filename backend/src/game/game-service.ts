@@ -107,8 +107,16 @@ export class GameService {
         if (senderTank === undefined) {
             return; // TODO: This is an error. Handle somehow!
         }
-        senderTank.x += message.data.x;
-        senderTank.y += message.data.y;
+        if (message.data.x !== 0
+            && senderTank.x + message.data.x + TankDescriptor.side < MapDescriptor.width
+            && senderTank.x + message.data.x >= 0) {
+            senderTank.x += message.data.x;
+        }
+        if (message.data.y !== 0
+            && senderTank.y + message.data.y + TankDescriptor.side < MapDescriptor.height
+            && senderTank.y + message.data.y >= 0) {
+            senderTank.y += message.data.y;
+        }
         senderTank.dir = message.data.dir;
     }
 
@@ -138,8 +146,8 @@ export class GameService {
 
     private generateNewTank(): TankStatus {
         for (let i = 0; i < EXIT_LIMIT; i++) {
-            let x = Math.random() * MapDescriptor.width;
-            let y = Math.random() * MapDescriptor.height;
+            let x = Math.random() * MapDescriptor.width - TankDescriptor.side - 1;
+            let y = Math.random() * MapDescriptor.height - TankDescriptor.side - 1;
             if (!this.checkTankHitAgainstAllTanks(x, y)) {
                 return {
                     x: x,
@@ -160,7 +168,7 @@ export class GameService {
     }
 
     private checkBulletHit(bullet: Bullet): boolean {
-        if (bullet.x < 0 || bullet.y < 0 || bullet.x >= MapDescriptor.width, bullet.y >= MapDescriptor.height) {
+        if (bullet.x < 0 || bullet.y < 0 || bullet.x >= MapDescriptor.width || bullet.y >= MapDescriptor.height) {
             return true;
         }
         for (let entries of this.gameStatus.tanks.entries()) {
