@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as fs from "fs";
 import jwt from "jsonwebtoken";
-import { AdminDao } from "../database/AdminDao";
+import { AdminDao } from "../database/AdminDAO";
 import { User } from "../model/User";
 import { ActiveAdminService } from "../websocket/activeAdmin-service";
 

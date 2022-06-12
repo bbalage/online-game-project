@@ -17,7 +17,7 @@ export class LoginComponent {
   isUserValid: boolean = true;
   isAdmin: boolean = false;
 
-  constructor(private router: Router, private userService: UserService) {}
+  constructor(private router: Router, private userService: UserService) { }
 
   login() {
     const user = this.loginForm.value;
@@ -29,7 +29,7 @@ export class LoginComponent {
         (err) => (this.isUserValid = false)
       );
     } else {
-      this.userService.authenticateUser(user).subscribe(
+      this.userService.authenticateAdmin(user).subscribe(
         () => {
           this.router.navigateByUrl('/home');
         },
