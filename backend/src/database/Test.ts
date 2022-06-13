@@ -1,3 +1,4 @@
+import { AdminDao } from "./AdminDao";
 import { UserDao } from "./UserDAO";
 import { UserHistoryDAO } from "./UserHistoryDAO";
 
@@ -30,6 +31,37 @@ const userHistory = new UserHistoryDAO();
 //     console.log("ERROR");
 //     console.log(res);
 // })
+
+const admindao = new AdminDao();
+
+
+admindao.addAdmin({
+     id:1,
+     username:"admin",
+     password:"asd"
+ }).then(function(res){
+     console.log("Add admin");
+     console.log(res);
+ }).catch(function(res){
+     console.log("Add admin");
+     console.log("ERROR");
+     console.log(res);
+ })
+
+admindao.getLoginAdminId({
+    id: 1,
+     username: "admin",
+     password: "asd"
+ }).then(function(res){
+
+    console.log("getloginadminid admin");
+     console.log(res);
+ }).catch(function(res){
+
+    console.log("getloginadminid admin");
+     console.log("ERROR");
+     console.log(res);
+ })
 
 userdao.getLoginUserId(
      {

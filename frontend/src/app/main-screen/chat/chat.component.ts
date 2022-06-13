@@ -32,8 +32,6 @@ export class ChatComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // TODO: Mocked
-    this.currentUsername = "Paul";
 
   }
 

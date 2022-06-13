@@ -27,6 +27,7 @@ import { MatTableModule } from '@angular/material/table';
 import { UsersComponent } from './admin/users/users.component';
 import { ScoresComponent } from './admin/scores/scores.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { AdminChatComponent } from './admin/admin-chat/admin-chat.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     RegistrationComponent,
     UsersComponent,
     ScoresComponent,
+    AdminChatComponent,
   ],
   imports: [
     BrowserModule,

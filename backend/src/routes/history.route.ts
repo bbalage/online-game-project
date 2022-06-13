@@ -34,7 +34,6 @@ export function getHistoryRouter(): Router {
     router.get("/get", async function (req, res) {
         userHistoryDao.getAllUserHistory()
             .then(function (histories: UserHistorySend[]) {
-                console.log(histories);
                 res.status(200).send(histories);
             })
             .catch(function () {

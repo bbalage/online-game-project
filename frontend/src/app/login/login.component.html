@@ -1,10 +1,10 @@
 <div class="container">
     <mat-card>
         <mat-card-content>
-            <form [formGroup]="loginForm" (ngSubmit)= "login()">
+            <form [formGroup]="loginForm" (ngSubmit)="login()">
                 <h1>Log In</h1>
                 <mat-form-field>
-                    <input matInput placeholder="Karesz576" formControlName="username" />
+                    <input matInput placeholder="Username" formControlName="username" />
                     <mat-error> Please provide a valid username </mat-error>
                 </mat-form-field>
                 <mat-form-field>
@@ -13,7 +13,9 @@
                 </mat-form-field>
                 <div class="actions">
                     <button mat-raised-button color="primary" [disabled]="!loginForm.valid">Login</button>
-                    <button (click)="register()" mat-raised-button color="accent">Register</button>
+                    <button mat-raised-button color="accent" [disabled]="isAdmin" (click)="register()">Register</button>
+                    <mat-checkbox [(ngModel)]="isAdmin" [ngModelOptions]="{standalone: true}" color="primary">Admin user
+                    </mat-checkbox>
                 </div>
                 <mat-error *ngIf="!isUserValid"> Invalid credentials! </mat-error>
             </form>

@@ -15,17 +15,29 @@ export class LoginComponent {
   });
 
   isUserValid: boolean = true;
+  isAdmin: boolean = false;
 
-  constructor(private router: Router, private userService: UserService) {}
+  constructor(private router: Router, private userService: UserService) { }
 
   login() {
+    console.log("Submit");
     const user = this.loginForm.value;
-    this.userService.authenticateUser(user).subscribe(
-      () => {
-        this.router.navigateByUrl('/home');
-      },
-      (err) => (this.isUserValid = false)
-    );
+    if (this.isAdmin) {
+      this.userService.authenticateAdmin(user).subscribe(
+        () => {
+          console.log("Routing admin.");
+          this.router.navigateByUrl('/admin');
+        },
+        (err) => (this.isUserValid = false)
+      );
+    } else {
+      this.userService.authenticateUser(user).subscribe(
+        () => {
+          this.router.navigateByUrl('/home');
+        },
+        (err) => (this.isUserValid = false)
+      );
+    }
   }
 
   register() {

@@ -9,7 +9,14 @@ Prequisite:
 - node (our version: v12.22.12)
 - npm (our version: 6.14.16)
 
-First clone the repository then open a terminal. From the directory of the cloned repository, issue the following commands:
+First open a terminal, clone the repository, then cd into the directiory.
+
+```
+git clone https://github.com/bbalage/online-game-project.git
+cd online-game-project
+```
+
+To launch the backend, issue the following commands:
 
 ```
 cd backend

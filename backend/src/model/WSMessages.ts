@@ -32,7 +32,7 @@ export interface WSMessageSend {
 
 export interface WSMessageChatReceived {
     header: {
-        jwtToken: string,
+        username: string | null,
         timestamp: Date
     }
     data: {

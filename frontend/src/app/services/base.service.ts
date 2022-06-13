@@ -4,7 +4,7 @@ import { Observable, throwError } from 'rxjs';
 
 @Injectable()
 export class BaseService {
-  constructor() {}
+  constructor() { }
 
   protected handleError(errorRes: HttpErrorResponse): Observable<never> {
     let errorMsg = `Status: ${errorRes.status}, An error has occured`;

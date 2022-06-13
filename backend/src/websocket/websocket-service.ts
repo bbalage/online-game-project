@@ -11,6 +11,7 @@ import {
     WSSendMessageType
 } from '../model/WSMessages';
 import { ActiveUserService } from './activeUser-service';
+import { ActiveAdminService } from './activeAdmin-service';
 
 export class WebSocketService {
 
@@ -21,7 +22,7 @@ export class WebSocketService {
     public readonly shootCannonMessages$ = new Subject<WSMessageShootCannonReceived>();
     public readonly userSessionExpired$ = new Subject<number>();
 
-    constructor(server: http.Server, private activeUserService: ActiveUserService) {
+    constructor(server: http.Server, private activeUserService: ActiveUserService, private activeAdminService: ActiveAdminService) {
         this.initWebSocket(server);
     }
 
@@ -35,7 +36,13 @@ export class WebSocketService {
                 if (msg.header.jwtToken === undefined) {
                     return;
                 }
-                if (!this.activeUserService.isUserActive(msg.header.jwtToken)) {
+                const token = msg.header.jwtToken;
+                const isAdmin = this.activeAdminService.isAdminActive(token);
+                if (isAdmin) {
+                    this.handleAdminMessage(msg);
+                    return;
+                }
+                if (!this.activeUserService.isUserActive(token)) {
                     const reply: WSMessageSend = {
                         header: {
                             type: WSSendMessageType.Logout,
@@ -73,7 +80,10 @@ export class WebSocketService {
                     case WSRecievedMessageType.ChatMessage:
                         if (msg.data && msg.data.text) {
                             this.chatMessages$.next({
-                                header: msg.header,
+                                header: {
+                                    username: this.activeUserService.getUserName(msg.header.jwtToken),
+                                    timestamp: msg.header.timestamp
+                                },
                                 data: {
                                     text: msg.data.text
                                 }
@@ -99,5 +109,21 @@ export class WebSocketService {
         this.ws.clients.forEach((client) => {
             client.send(JSON.stringify(message));
         });
+    }
+
+    private handleAdminMessage(msg: WSMessageReceived) {
+        if (msg.header.type === WSRecievedMessageType.ChatMessage) {
+            if (msg.data && msg.data.text) {
+                this.chatMessages$.next({
+                    header: {
+                        username: this.activeAdminService.getAdminName(msg.header.jwtToken),
+                        timestamp: msg.header.timestamp
+                    },
+                    data: {
+                        text: msg.data.text
+                    }
+                });
+            }
+        }
     }
 }

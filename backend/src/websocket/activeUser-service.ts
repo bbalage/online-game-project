@@ -13,6 +13,7 @@ export class ActiveUserService {
             expiresAt: expiresIn + Math.floor(Date.now() / 1000)
         }
         ActiveUserService.activeUserTokens.set(token, activeUser);
+        console.log("Added user.");
     }
 
     public getUserName(token: string): string | null {
@@ -46,7 +47,7 @@ export class ActiveUserService {
         if (activeUser === undefined) {
             return false;
         }
-        if (!this.isUserConnectionExpired(activeUser)) {
+        if (this.isUserConnectionExpired(activeUser)) {
             this.removeUser(token);
             return false;
         }
@@ -54,7 +55,7 @@ export class ActiveUserService {
     }
 
     public isUserConnectionExpired(activeUser: ActiveUser): boolean {
-        return activeUser.expiresAt > Math.floor(Date.now() / 1000);
+        return activeUser.expiresAt < Math.floor(Date.now() / 1000);
     }
 
     private clearUserIfAlreadyExists(token: string, user: User) {
