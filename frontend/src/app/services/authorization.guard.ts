@@ -6,13 +6,14 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
 import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthorizationGuard implements CanActivate {
-  constructor(private router: Router, private userService: UserService) {}
+  constructor(private router: Router, private userService: UserService) { }
 
   canActivate(
     route: ActivatedRouteSnapshot,
@@ -25,17 +26,15 @@ export class AuthorizationGuard implements CanActivate {
       return false;
     }
 
+    let success = true;
     if (route.url[0].path == 'admin') {
-      this.userService.checkAdmin().subscribe((id) => 
-      {
-        if (!id) {
-          this.router.navigateByUrl('/')
-          return false;
-        }
-        return true;
-      });
+      this.userService.checkAdmin()
+        .pipe(catchError((err) => {
+          // TODO: Make page log out user.
+          return err;
+        }));
     }
 
-    return true;
+    return success;
   }
 }

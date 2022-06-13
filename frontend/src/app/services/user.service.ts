@@ -76,7 +76,6 @@ export class UserService extends BaseService {
 
   public checkAdmin() {
     return this.http
-      .get(environment.serverUrl + environment.admin + environment.check)
-      .pipe(catchError((err) => this.handleError(err)));
+      .get(environment.serverUrl + environment.admin + environment.check, { observe: 'response' });
   }
 }

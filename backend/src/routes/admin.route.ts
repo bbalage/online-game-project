@@ -45,7 +45,7 @@ export function getRouter(activeAdminService: ActiveAdminService): Router {
 
   router.get("/check", async function (req, res) {
     const token: string = req.body.token;
-    if (activeAdminService.getId(token)) {
+    if (activeAdminService.isAdminActive(token)) {
       res.status(200).send();
     } else {
       res.status(401).send();

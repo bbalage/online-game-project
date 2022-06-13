@@ -6,57 +6,56 @@ export interface TokenSwitch {
 }
 
 export class ActiveAdminService {
-    private static activeAdmin: ActiveUser | undefined;
+    private static activeUserTokens: Map<string, ActiveUser> = new Map<string, ActiveUser>();
 
     public setAdmin(token: string, expiresIn: number, user: User) {
-        this.removeUser(token);
+        this.removeAdmin(token);
         const activeUser: ActiveUser = {
             user: user,
             expiresAt: expiresIn + Math.floor(Date.now() / 1000)
         }
-        ActiveAdminService.activeAdmin = activeUser;
+        ActiveAdminService.activeUserTokens.set(token, activeUser);
     }
 
-    public getUserName(token: string): string | null {
-        if (!this.isUserActive(token)) {
+    public getAdminName(token: string): string | null {
+        if (!this.isAdminActive(token)) {
             return null;
         }
-        const activeUser: ActiveUser | undefined = ActiveAdminService.activeAdmin;
-        if (activeUser === undefined) {
+        const activeAdmin: ActiveUser | undefined = ActiveAdminService.activeUserTokens.get(token);
+        if (activeAdmin === undefined) {
             return null;
         }
-        return activeUser.user.username;
+        return activeAdmin.user.username;
     }
 
     public getId(token: string): number | null {
-        if (!this.isUserActive(token)) {
+        if (!this.isAdminActive(token)) {
             return null;
         }
-        const activeUser: ActiveUser | undefined = ActiveAdminService.activeAdmin;
+        const activeUser: ActiveUser | undefined = ActiveAdminService.activeUserTokens.get(token);
         if (activeUser === undefined) {
             return null;
         }
-
         return activeUser.user.id;
     }
 
-    public removeUser(token: string) {
-        ActiveAdminService.activeAdmin = undefined;
+    public removeAdmin(token: string) {
+        ActiveAdminService.activeUserTokens.delete(token);
     }
 
-    public isUserActive(token: string): boolean {
-        const activeUser: ActiveUser | undefined = ActiveAdminService.activeAdmin;
-        if (activeUser === undefined) {
+    public isAdminActive(token: string): boolean {
+        const activeAdmin: ActiveUser | undefined = ActiveAdminService.activeUserTokens.get(token);
+        if (activeAdmin === undefined) {
             return false;
         }
-        if (!this.isUserConnectionExpired(activeUser)) {
-            this.removeUser(token);
+        if (this.isUserConnectionExpired(activeAdmin)) {
+            this.removeAdmin(token);
             return false;
         }
         return true;
     }
 
-    public isUserConnectionExpired(activeUser: ActiveUser): boolean {
-        return activeUser.expiresAt > Math.floor(Date.now() / 1000);
+    public isUserConnectionExpired(activeAdmin: ActiveUser): boolean {
+        return activeAdmin.expiresAt < Math.floor(Date.now() / 1000);
     }
 }

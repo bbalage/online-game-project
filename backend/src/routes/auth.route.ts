@@ -49,7 +49,6 @@ export function getRouter(activeUserService: ActiveUserService): Router {
   router.get("/get", async function (req, res) {
     userdao.getAllUserNameAndId()
       .then(function (users: User[]) {
-        console.log(users);
         res.status(200).send(users);
       })
       .catch(function () {

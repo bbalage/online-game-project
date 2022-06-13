@@ -23,11 +23,12 @@ export class WebSocketService {
   }
 
   sendMessage(message: WSMessageSend) {
+    console.log("Sending message.")
     const sendJSON = JSON.stringify(message);
     this.ws.send(sendJSON);
   }
 
-  isOpen() : boolean {
+  isOpen(): boolean {
     return this.ws.readyState === this.ws.OPEN;
   }
 

@@ -61,9 +61,8 @@ export class UserDao {
         return new Promise(function (resolve, reject) {
             prepared.all(function (err, rows) {
                 if (!err) {
-                    console.log(rows);
                     let userList: User[] = []
-                    
+
                     for (const row of rows) {
                         let user: User = {
                             id: row.id,

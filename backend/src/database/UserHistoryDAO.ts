@@ -63,7 +63,6 @@ export class UserHistoryDAO {
         return new Promise<UserHistorySend[]>(function (resolve, reject) {
             prepared.all((err, rows) => {
                 if (!err) {
-                    console.log(rows);
                     let historyList: UserHistorySend[] = []
 
                     for (const row of rows) {
