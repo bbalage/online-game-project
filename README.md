@@ -63,3 +63,8 @@ On the admin site you can:
 - List and add users.
 - See high scores.
 - Send chat messages.
+
+You can log in to the admin site using the following credentials:
+
+*username*: admin<br/>
+*password*: admin
