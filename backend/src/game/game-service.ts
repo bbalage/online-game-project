@@ -145,8 +145,8 @@ export class GameService {
 
     private generateNewTank(): TankStatus {
         for (let i = 0; i < EXIT_LIMIT; i++) {
-            let x = Math.random() * MapDescriptor.width - TankDescriptor.side - 1;
-            let y = Math.random() * MapDescriptor.height - TankDescriptor.side - 1;
+            let x = Math.random() * (MapDescriptor.width - TankDescriptor.side - 1);
+            let y = Math.random() * (MapDescriptor.height - TankDescriptor.side - 1);
             if (!this.checkTankHitAgainstAllTanks(x, y)) {
                 return {
                     x: x,
