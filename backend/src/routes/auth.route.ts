@@ -64,7 +64,7 @@ export function getRouter(activeUserService: ActiveUserService): Router {
     console.log(username);
 
     if (username) {
-      res.status(200).send({ "username": username })
+      res.status(200).send(username)
     }
     else {
       res.status(400).send("User does not exists");
