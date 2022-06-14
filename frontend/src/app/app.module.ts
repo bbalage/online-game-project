@@ -21,13 +21,14 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RegistrationComponent } from './registration/registration.component';
 import { MatTableModule } from '@angular/material/table';
 import { UsersComponent } from './admin/users/users.component';
 import { ScoresComponent } from './admin/scores/scores.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AdminChatComponent } from './admin/admin-chat/admin-chat.component';
+import { TokenInterceptor } from './services/token-interceptor';
 
 @NgModule({
   declarations: [
@@ -64,7 +65,11 @@ import { AdminChatComponent } from './admin/admin-chat/admin-chat.component';
     MatTableModule,
     MatSnackBarModule
   ],
-  providers: [],
+  providers: [{
+    provide: HTTP_INTERCEPTORS,
+    useClass: TokenInterceptor,
+    multi: true,
+  }],
   bootstrap: [AppComponent],
 })
 export class AppModule { }
