@@ -56,5 +56,20 @@ export function getRouter(activeUserService: ActiveUserService): Router {
       });
   });
 
+  router.post("/getOne", async function (req, res) {
+    const token: string = req.body.token;
+    activeUserService = new ActiveUserService();
+
+    const username = activeUserService.getUserName(token);
+    console.log(username);
+
+    if (username) {
+      res.status(200).send(username)
+    }
+    else {
+      res.status(400).send("User does not exists");
+    }
+  });
+
   return router;
 }

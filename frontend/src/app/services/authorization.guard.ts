@@ -28,11 +28,10 @@ export class AuthorizationGuard implements CanActivate {
 
     let success = true;
     if (route.url[0].path == 'admin') {
-      this.userService.checkAdmin()
-        .pipe(catchError((err) => {
-          // TODO: Make page log out user.
-          return err;
-        }));
+      success = this.userService.checkAdmin();
+      if(!success){
+        this.router.navigateByUrl('/');
+      }
     }
 
     return success;

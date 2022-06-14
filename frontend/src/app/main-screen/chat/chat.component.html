@@ -1,18 +1,16 @@
-<div style="height: 100%">
-    <div style="overflow-y: scroll; height: 80%; flex-direction: column-reverse" id="scroll">
+<div class="h-100">
+    <div style="overflow-y: auto; height: 80%; flex-direction: column-reverse" id="scroll">
         <div *ngFor="let chatBubble of chatBubbles" style="overflow-wrap: anywhere !important; padding: 1em;">
-            <div>{{chatBubble.username}} {{chatBubble.time | date}}</div>
-            <mat-card [ngStyle]="{'background-color': (chatBubble.username==this.currentUsername) ? 'white':'#a6a6a6'}">
-
+            <div>{{chatBubble.username}} {{chatBubble.time | date: "medium"}}</div>
+            <mat-card [ngStyle]="{'background-color': (chatBubble.username == currentUsername) ? 'skyblue':'lightgrey'}">
                 <mat-card-content>
-
                     {{ chatBubble.text }}
                 </mat-card-content>
             </mat-card>
         </div>
         {{this.scrollDown()}}
     </div>
-    <div style="height: 20%; text-align: center; ">
+    <div style="height: 20%; text-align: center;">
         <mat-form-field appearance="fill" [formGroup]="messageForm" (click)="switchToChat()">
             <mat-label>Input</mat-label>
             <input matInput formControlName="message" (keypress)="onKeyPress($event)">

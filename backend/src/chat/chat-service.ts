@@ -1,4 +1,4 @@
-import { WSRecievedMessageType, WSMessageChatReceived, WSSendMessageType } from '../model/WSMessages';
+import { WSMessageChatReceived, WSSendMessageType } from '../model/WSMessages';
 import { ActiveAdminService } from '../websocket/activeAdmin-service';
 import { ActiveUserService } from '../websocket/activeUser-service';
 import { WebSocketService } from '../websocket/websocket-service';
