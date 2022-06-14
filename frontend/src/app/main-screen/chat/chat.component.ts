@@ -2,7 +2,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { WebSocketService } from 'src/app/services/websocket.service';
 import { FormControl, FormGroup } from '@angular/forms';
 import { WSMessageChatReceived, WSSendMessageType } from 'src/app/models/WSMessages';
-import { ID_TOKEN_KEY } from 'src/app/services/user.service';
+import { ID_TOKEN_KEY, UserService } from 'src/app/services/user.service';
 
 interface ChatBubble {
   time: Date,
@@ -16,7 +16,7 @@ interface ChatBubble {
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit {
-  currentUsername: string = "NoUserName";
+  currentUsername: string = "";
   chatBubbles: ChatBubble[] = [];
   messageForm = new FormGroup({
     message: new FormControl('')
@@ -25,14 +25,16 @@ export class ChatComponent implements OnInit {
   @Output()
   switchedToChat: EventEmitter<undefined> = new EventEmitter();
 
-  constructor(private webSocketService: WebSocketService) {
+  constructor(private webSocketService: WebSocketService, private userService: UserService) {
     webSocketService.chatMessages$.subscribe({
       next: (message: WSMessageChatReceived) => this.receiveChatMessage(message)
     });
   }
 
   ngOnInit(): void {
-
+    this.userService.getUsername().subscribe((res) => {
+      this.currentUsername = res.username;
+    })
   }
 
   private receiveChatMessage(message: WSMessageChatReceived) {

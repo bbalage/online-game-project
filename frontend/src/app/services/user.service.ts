@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { catchError, map } from 'rxjs/operators';
 import { User } from '../models/User';
@@ -77,5 +77,13 @@ export class UserService extends BaseService {
   public checkAdmin() {
     return this.http
       .get(environment.serverUrl + environment.admin + environment.check, { observe: 'response' });
+  }
+
+  public getUsername(): Observable<any> {
+    const token = sessionStorage.getItem("id_token");
+
+    return this.http
+      .post(environment.serverUrl + environment.users + environment.getOne, { token: token })
+      .pipe(catchError((err) => this.handleError(err)));
   }
 }

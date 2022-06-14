@@ -9,7 +9,6 @@ import { getHistoryRouter } from "./routes/history.route";
 import { GameService } from './game/game-service';
 import { ActiveUserService } from './websocket/activeUser-service';
 import { Game } from './game/game';
-import { AdminDao } from './database/AdminDAO';
 import { ActiveAdminService } from './websocket/activeAdmin-service';
 import { ScoreLoggerService } from './game/score-logger-service';
 

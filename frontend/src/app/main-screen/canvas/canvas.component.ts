@@ -122,7 +122,6 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
   private keyUpHandler(e: Event) {
     if (this.playMode) {
-      console.log(e);
     }
   }
 

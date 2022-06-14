@@ -1,4 +1,3 @@
-import { Subject } from "rxjs";
 import { ActiveUser, User } from "../model/User";
 
 ///This class could be used as login user memory, username can be determined by jwt token
@@ -13,7 +12,6 @@ export class ActiveUserService {
             expiresAt: expiresIn + Math.floor(Date.now() / 1000)
         }
         ActiveUserService.activeUserTokens.set(token, activeUser);
-        console.log("Added user.");
     }
 
     public getUserName(token: string): string | null {
@@ -44,6 +42,7 @@ export class ActiveUserService {
 
     public isUserActive(token: string): boolean {
         const activeUser: ActiveUser | undefined = ActiveUserService.activeUserTokens.get(token);
+
         if (activeUser === undefined) {
             return false;
         }
