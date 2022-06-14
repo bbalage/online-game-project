@@ -12,6 +12,9 @@ export const ID_TOKEN_KEY = "id_token";
   providedIn: 'root',
 })
 export class UserService extends BaseService {
+
+  private isAdmin: boolean = false;
+
   constructor(private http: HttpClient) {
     super();
   }
@@ -24,6 +27,7 @@ export class UserService extends BaseService {
       )
       .pipe(
         map((res) => {
+          this.isAdmin = false;
           this.setSession(res);
         }),
         catchError((err) => this.handleError(err))
@@ -38,6 +42,7 @@ export class UserService extends BaseService {
       )
       .pipe(
         map((res) => {
+          this.isAdmin = true;
           this.setSession(res);
         }),
         catchError((err) => this.handleError(err))
@@ -47,6 +52,7 @@ export class UserService extends BaseService {
 
   public logoutUser() {
     sessionStorage.clear();
+    this.isAdmin = false;
   }
 
   private setSession(authResult: any) {
@@ -74,9 +80,8 @@ export class UserService extends BaseService {
       .pipe<User[]>(catchError((err) => this.handleError(err)));
   }
 
-  public checkAdmin() {
-    return this.http
-      .get(environment.serverUrl + environment.admin + environment.check, { observe: 'response' });
+  public checkAdmin() :boolean {
+    return this.isAdmin;
   }
 
   public getUsername(): Observable<any> {
